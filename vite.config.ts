@@ -22,5 +22,11 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: ['react-helmet-async']
+  },
+  base: './', // Use relative paths for assets
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+    sourcemap: false, // Disable sourcemaps for production
   }
 }));
