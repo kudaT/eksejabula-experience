@@ -24,7 +24,14 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminBlog from "./pages/admin/AdminBlog";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -34,6 +41,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Layout><Index /></Layout>} />
             <Route path="/los-vega" element={<Layout><LosVega /></Layout>} />
             <Route path="/shop" element={<Layout><Shop /></Layout>} />
@@ -41,8 +49,14 @@ const App = () => (
             <Route path="/blog" element={<Layout><Blog /></Layout>} />
             <Route path="/blog/:id" element={<Layout><BlogPost /></Layout>} />
             <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/account" element={<Layout><Account /></Layout>} />
             <Route path="/unauthorized" element={<Layout><Unauthorized /></Layout>} />
+            
+            {/* Customer Routes (must be authenticated) */}
+            <Route path="/account" element={
+              <ProtectedRoute>
+                <Layout><Account /></Layout>
+              </ProtectedRoute>
+            } />
             
             {/* Admin Routes */}
             <Route path="/admin" element={
