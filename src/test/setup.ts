@@ -53,8 +53,8 @@ class MockIntersectionObserver {
   unobserve = vi.fn();
   disconnect = vi.fn();
   
-  constructor(callback) {
-    this.callback = callback;
+  constructor() {
+    // No callback property needed
   }
 }
 
