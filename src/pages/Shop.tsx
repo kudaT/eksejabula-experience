@@ -32,6 +32,7 @@ const productData = [
     imageUrl: 'https://images.unsplash.com/photo-1577280927879-b2f0b15c5409',
     category: 'Jerseys',
     isNew: true,
+    isSoldOut: false,
   },
   {
     id: '2',
@@ -40,6 +41,7 @@ const productData = [
     imageUrl: 'https://images.unsplash.com/photo-1580087632545-b497034a0a74',
     category: 'Jerseys',
     isFeatured: true,
+    isSoldOut: false,
   },
   {
     id: '3',
@@ -48,6 +50,7 @@ const productData = [
     discount: 10,
     imageUrl: 'https://images.unsplash.com/photo-1541051595295-e0e3ad01db18',
     category: 'Jerseys',
+    isSoldOut: false,
   },
   {
     id: '4',
@@ -55,6 +58,7 @@ const productData = [
     price: 249,
     imageUrl: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531',
     category: 'Beanies',
+    isSoldOut: false,
   },
   {
     id: '5',
@@ -63,6 +67,7 @@ const productData = [
     imageUrl: 'https://images.unsplash.com/photo-1578020190125-f4f7c26f4cff',
     category: 'Beanies',
     isNew: true,
+    isSoldOut: false,
   },
   {
     id: '6',
@@ -70,6 +75,7 @@ const productData = [
     price: 249,
     imageUrl: 'https://images.unsplash.com/photo-1611249021021-21220638532a',
     category: 'Beanies',
+    isSoldOut: false,
   },
   {
     id: '7',
@@ -78,6 +84,7 @@ const productData = [
     imageUrl: 'https://images.unsplash.com/photo-1561839561-b13bcfe95249',
     category: 'Art',
     discount: 15,
+    isSoldOut: false,
   },
   {
     id: '8',
@@ -85,6 +92,7 @@ const productData = [
     price: 299,
     imageUrl: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853',
     category: 'Art',
+    isSoldOut: false,
   },
   {
     id: '9',
@@ -92,6 +100,7 @@ const productData = [
     price: 379,
     imageUrl: 'https://images.unsplash.com/photo-1547891654-e66ed7ebb968',
     category: 'Art',
+    isSoldOut: false,
   },
   {
     id: '10',
@@ -100,6 +109,7 @@ const productData = [
     imageUrl: 'https://images.unsplash.com/photo-1566677914817-56426959ae9c',
     category: 'Jerseys',
     isFeatured: true,
+    isSoldOut: false,
   },
   {
     id: '11',
@@ -108,6 +118,7 @@ const productData = [
     imageUrl: 'https://images.unsplash.com/photo-1607611439230-fcbf50e42f54',
     category: 'Beanies',
     isFeatured: true,
+    isSoldOut: false,
   },
   {
     id: '12',
@@ -116,6 +127,7 @@ const productData = [
     imageUrl: 'https://images.unsplash.com/photo-1536924430914-91f9e2041b83',
     category: 'Art',
     isNew: true,
+    isSoldOut: false,
   },
 ];
 
