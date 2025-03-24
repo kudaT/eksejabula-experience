@@ -29,6 +29,38 @@ if (!isset($data['email']) || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)
 
 $email = $data['email'];
 
+// Store subscriber in the database
+// Connect to the database (assuming PostgreSQL using environment variables)
+// In a production environment, these would be retrieved from environment variables
+$db_host = getenv('DB_HOST') ?: 'localhost';
+$db_name = getenv('DB_NAME') ?: 'postgres';
+$db_user = getenv('DB_USER') ?: 'postgres';
+$db_password = getenv('DB_PASSWORD') ?: 'postgres';
+
+try {
+    // Create PDO connection
+    $dsn = "pgsql:host=$db_host;dbname=$db_name;";
+    $pdo = new PDO($dsn, $db_user, $db_password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+    
+    // Check if subscriber already exists
+    $stmt = $pdo->prepare("SELECT * FROM subscribers WHERE email = :email");
+    $stmt->execute(['email' => $email]);
+    $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$existing) {
+        // Insert new subscriber
+        $stmt = $pdo->prepare("INSERT INTO subscribers (email, confirmed) VALUES (:email, true)");
+        $stmt->execute(['email' => $email]);
+    }
+    
+    // Log the subscription action
+    error_log("Newsletter subscription: $email");
+} catch (PDOException $e) {
+    // Log the error but continue with email sending
+    error_log("Database error in subscription process: " . $e->getMessage());
+    // We won't exit here, as we still want to try sending the email
+}
+
 // Set up email to subscriber
 $to = $email;
 $subject = 'Welcome to the Eksejabula Community!';
@@ -77,6 +109,13 @@ $admin_message = '<div style="font-family: Arial, sans-serif; max-width: 600px; 
 </div>';
 
 $admin_mail_sent = mail($admin_to, $admin_subject, $admin_message, $headers);
+
+// Log email sending result
+if ($mail_sent) {
+    error_log("Welcome email sent to: $email");
+} else {
+    error_log("Failed to send welcome email to: $email");
+}
 
 if ($mail_sent) {
     echo json_encode(['success' => true]);

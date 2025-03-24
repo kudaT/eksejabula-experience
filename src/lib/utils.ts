@@ -1,6 +1,7 @@
 
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { supabase } from "@/integrations/supabase/client";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -34,20 +35,34 @@ export function formatCurrency(amount: string | number, currency = 'ZAR'): strin
  */
 export async function subscribeToNewsletter(email: string): Promise<{ success: boolean; message: string }> {
   try {
-    const res = await fetch('/api/subscribe', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email }),
-    });
-    
-    if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.error || 'Failed to subscribe');
+    // Try the Supabase function first, which handles database storage
+    try {
+      const { data, error } = await supabase.functions.invoke('subscribe', {
+        body: { email },
+      });
+      
+      if (error) throw error;
+      
+      return { success: true, message: 'Thank you for subscribing!' };
+    } catch (supabaseError) {
+      console.warn('Supabase function failed, falling back to API endpoint:', supabaseError);
+      
+      // Fall back to the API endpoint if Supabase function fails
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to subscribe');
+      }
+      
+      return { success: true, message: 'Thank you for subscribing!' };
     }
-    
-    return { success: true, message: 'Thank you for subscribing!' };
   } catch (error) {
     console.error('Newsletter subscription error:', error);
     return { 
