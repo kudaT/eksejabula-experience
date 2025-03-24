@@ -1,7 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
-import { createHmac } from "https://deno.land/std@0.178.0/node/crypto.ts";
+import * as crypto from "https://deno.land/std@0.178.0/crypto/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,9 +33,21 @@ serve(async (req) => {
     const body = await req.text();
     
     // Verify the signature
-    const hash = createHmac("sha512", paystackSecret)
-      .update(body)
-      .digest("hex");
+    const encoder = new TextEncoder();
+    const data = encoder.encode(body);
+    const key = encoder.encode(paystackSecret);
+    const hmac = await crypto.subtle.importKey(
+      "raw",
+      key,
+      { name: "HMAC", hash: "SHA-512" },
+      false,
+      ["sign"]
+    );
+    
+    const signature_bytes = await crypto.subtle.sign("HMAC", hmac, data);
+    const hash = Array.from(new Uint8Array(signature_bytes))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
     
     if (hash !== signature) {
       return new Response(
