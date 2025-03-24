@@ -15,6 +15,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 import { cn } from '@/lib/utils';
 import CartDropdown from '../ui-custom/CartDropdown';
 import { useAuth } from '@/context/AuthContext';
@@ -64,21 +73,36 @@ const Navbar = () => {
             Eksejabula
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1">
-            <Link to="/" className="nav-link">
-              Home
-            </Link>
-            <Link to="/los-vega" className="nav-link">
-              Los Vega
-            </Link>
-            <Link to="/blog" className="nav-link">
-              Blog
-            </Link>
-            <Link to="/shop" className="nav-link">
-              Shop
-            </Link>
+          {/* Centered Navigation */}
+          <div className="flex-1 flex justify-center">
+            <NavigationMenu className="hidden md:flex">
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <Link to="/" className="nav-link">
+                    Home
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/los-vega" className="nav-link">
+                    Los Vega
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/blog" className="nav-link">
+                    Blog
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/shop" className="nav-link">
+                    Shop
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
 
+          {/* Right Actions */}
+          <div className="hidden md:flex items-center space-x-1">
             {/* Cart Icon with Badge */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -180,7 +204,7 @@ const Navbar = () => {
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
-          </nav>
+          </div>
 
           {/* Mobile Menu Toggle */}
           <Button 
@@ -273,3 +297,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
