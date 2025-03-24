@@ -15,6 +15,14 @@ import BlogPost from "./pages/BlogPost";
 import SignIn from "./pages/SignIn";
 import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
+import Unauthorized from "./pages/Unauthorized";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AdminOrders from "./pages/admin/AdminOrders";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminBlog from "./pages/admin/AdminBlog";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +42,21 @@ const App = () => (
             <Route path="/blog/:id" element={<Layout><BlogPost /></Layout>} />
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/account" element={<Layout><Account /></Layout>} />
+            <Route path="/unauthorized" element={<Layout><Unauthorized /></Layout>} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<AdminDashboard />} />
+              <Route path="products" element={<AdminProducts />} />
+              <Route path="orders" element={<AdminOrders />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="blog" element={<AdminBlog />} />
+            </Route>
+            
             <Route path="*" element={<Layout><NotFound /></Layout>} />
           </Routes>
         </BrowserRouter>

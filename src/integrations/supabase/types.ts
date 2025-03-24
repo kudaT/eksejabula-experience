@@ -9,16 +9,225 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      blog_posts: {
+        Row: {
+          content: string | null
+          cover_image: string | null
+          id: string
+          published_at: string | null
+          slug: string
+          title: string
+        }
+        Insert: {
+          content?: string | null
+          cover_image?: string | null
+          id?: string
+          published_at?: string | null
+          slug: string
+          title: string
+        }
+        Update: {
+          content?: string | null
+          cover_image?: string | null
+          id?: string
+          published_at?: string | null
+          slug?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      order_items: {
+        Row: {
+          custom_number: string | null
+          custom_text: string | null
+          customisation_price: number | null
+          id: string
+          order_id: string | null
+          product_id: string | null
+          quantity: number
+        }
+        Insert: {
+          custom_number?: string | null
+          custom_text?: string | null
+          customisation_price?: number | null
+          id?: string
+          order_id?: string | null
+          product_id?: string | null
+          quantity: number
+        }
+        Update: {
+          custom_number?: string | null
+          custom_text?: string | null
+          customisation_price?: number | null
+          id?: string
+          order_id?: string | null
+          product_id?: string | null
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string | null
+          id: string
+          status: Database["public"]["Enums"]["order_status"] | null
+          total_price: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["order_status"] | null
+          total_price: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["order_status"] | null
+          total_price?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_customisations: {
+        Row: {
+          id: string
+          label: string
+          price: number
+          product_id: string | null
+        }
+        Insert: {
+          id?: string
+          label: string
+          price: number
+          product_id?: string | null
+        }
+        Update: {
+          id?: string
+          label?: string
+          price?: number
+          product_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_customisations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          category: Database["public"]["Enums"]["product_category"] | null
+          created_at: string | null
+          customisable: boolean | null
+          description: string | null
+          id: string
+          image_urls: string[] | null
+          name: string
+          price: number
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["product_category"] | null
+          created_at?: string | null
+          customisable?: boolean | null
+          description?: string | null
+          id?: string
+          image_urls?: string[] | null
+          name: string
+          price: number
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["product_category"] | null
+          created_at?: string | null
+          customisable?: boolean | null
+          description?: string | null
+          id?: string
+          image_urls?: string[] | null
+          name?: string
+          price?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          phone_number: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          phone_number?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone_number?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_order: {
+        Args: {
+          p_user_id: string
+          p_items: Json
+        }
+        Returns: string
+      }
+      promote_to_admin: {
+        Args: {
+          user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      order_status: "pending" | "paid" | "cancelled" | "shipped"
+      product_category: "jersey" | "beanie" | "art"
+      user_role: "customer" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never

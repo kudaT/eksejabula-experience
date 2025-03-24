@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Menu, X, ShoppingCart, User, ChevronDown, 
-  LogOut, Settings, Package, Home, Newspaper, ShoppingBag
+  LogOut, Settings, Package, Home, Newspaper, ShoppingBag,
+  Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,13 +17,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import CartDropdown from '../ui-custom/CartDropdown';
+import { useAuth } from '@/context/AuthContext';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const location = useLocation();
+  const { user, isAdmin, signOut, loading } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -44,11 +46,6 @@ const Navbar = () => {
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location]);
-
-  // Demo function to toggle login state (to be replaced with actual auth logic)
-  const toggleLoginState = () => {
-    setIsUserLoggedIn(!isUserLoggedIn);
-  };
 
   return (
     <header className={cn(
@@ -115,10 +112,25 @@ const Navbar = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {isUserLoggedIn ? (
+                {user ? (
                   <>
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuLabel>
+                      {user.full_name ? `Hello, ${user.full_name}` : 'My Account'}
+                    </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    
+                    {isAdmin && (
+                      <DropdownMenuItem asChild>
+                        <Link 
+                          to="/admin" 
+                          className="flex items-center cursor-pointer"
+                        >
+                          <Shield className="mr-2 h-4 w-4" />
+                          <span>Admin Dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    
                     <DropdownMenuItem asChild>
                       <Link 
                         to="/account" 
@@ -139,7 +151,7 @@ const Navbar = () => {
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
-                      onClick={toggleLoginState}
+                      onClick={signOut}
                       className="cursor-pointer"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
@@ -222,6 +234,16 @@ const Navbar = () => {
               <ShoppingCart className="h-5 w-5" />
               <span>Shop</span>
             </Link>
+            
+            {isAdmin && (
+              <Link 
+                to="/admin" 
+                className="flex items-center space-x-2 text-lg px-2 text-primary"
+              >
+                <Shield className="h-5 w-5" />
+                <span>Admin Dashboard</span>
+              </Link>
+            )}
           </nav>
 
           <div className="mt-auto pb-8 pt-4 border-t">
@@ -230,10 +252,10 @@ const Navbar = () => {
                 <User className="h-5 w-5" />
                 <span>Account</span>
               </div>
-              {isUserLoggedIn ? (
+              {user ? (
                 <Button 
                   variant="ghost" 
-                  onClick={toggleLoginState}
+                  onClick={signOut}
                 >
                   Sign Out
                 </Button>
