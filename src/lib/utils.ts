@@ -26,3 +26,33 @@ export function formatCurrency(amount: string | number, currency = 'ZAR'): strin
     maximumFractionDigits: 2
   }).format(numericAmount);
 }
+
+/**
+ * Subscribe a user to the newsletter
+ * @param email User's email address
+ * @returns Promise with the result of the operation
+ */
+export async function subscribeToNewsletter(email: string): Promise<{ success: boolean; message: string }> {
+  try {
+    const res = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+    
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || 'Failed to subscribe');
+    }
+    
+    return { success: true, message: 'Thank you for subscribing!' };
+  } catch (error) {
+    console.error('Newsletter subscription error:', error);
+    return { 
+      success: false, 
+      message: error instanceof Error ? error.message : 'An unexpected error occurred'
+    };
+  }
+}

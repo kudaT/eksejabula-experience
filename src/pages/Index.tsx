@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import HeroSection from '@/components/ui-custom/HeroSection';
 import ProductCard from '@/components/ui-custom/ProductCard';
-import TestimonialCard from '@/components/ui-custom/TestimonialCard';
 
 // Sample product data
 const featuredProducts = [
@@ -43,28 +42,31 @@ const featuredProducts = [
   },
 ];
 
-// Sample testimonials
-const testimonials = [
+// Product categories
+const productCategories = [
   {
-    quote: "The Los Vega jersey is amazing! The quality is exceptional and the design is unlike anything I've seen before.",
-    author: "Sarah Johnson",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+    name: 'Jerseys',
+    imageUrl: 'https://images.unsplash.com/photo-1580087632545-b497034a0a74',
+    slug: 'jerseys',
   },
   {
-    quote: "I love the creative approach Eksejabula takes with their products. The beanie keeps me warm and stylish all winter.",
-    author: "Michael Rodriguez",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    name: 'Beanies',
+    imageUrl: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531',
+    slug: 'beanies',
   },
   {
-    quote: "Their art prints transformed my living space. Such vibrant colors and meaningful designs.",
-    author: "Emma Thompson",
-    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956",
-  },
+    name: 'Art & Posters',
+    imageUrl: 'https://images.unsplash.com/photo-1561839561-b13bcfe95249',
+    slug: 'art',
+  }
 ];
 
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [email, setEmail] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState('');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -74,6 +76,36 @@ const Index = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    if (!email) return;
+    
+    setSubmitting(true);
+    
+    try {
+      // Send to subscribe endpoint
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+      
+      if (response.ok) {
+        setEmail('');
+        setSubmitMessage('Thank you for subscribing!');
+      } else {
+        setSubmitMessage('Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      console.error('Subscription error:', error);
+      setSubmitMessage('Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="relative">
@@ -186,7 +218,7 @@ const Index = () => {
         <div className="text-center mb-12">
           <h2 className="section-title">Featured Products</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Our latest and most popular items, handpicked for you.
+            Explore our product categories.
           </p>
         </div>
 
@@ -239,16 +271,27 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="product-grid">
-          {featuredProducts
-            .filter(product => activeCategory === 'all' || 
-              product.category.toLowerCase() === activeCategory.toLowerCase())
-            .map(product => (
-              <ProductCard 
-                key={product.id} 
-                {...product} 
-                className="animate-on-scroll"
-              />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {productCategories
+            .filter(category => activeCategory === 'all' || 
+              category.slug === activeCategory)
+            .map((category, index) => (
+              <Link 
+                to={`/shop?category=${category.slug}`} 
+                key={index}
+                className="group animate-on-scroll rounded-lg overflow-hidden"
+              >
+                <div className="relative aspect-square overflow-hidden">
+                  <img 
+                    src={category.imageUrl} 
+                    alt={category.name} 
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                    <h3 className="text-white font-medium text-lg">{category.name}</h3>
+                  </div>
+                </div>
+              </Link>
             ))}
         </div>
 
@@ -304,28 +347,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-20 bg-gradient-to-b from-transparent to-secondary/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="section-title">What Our Customers Say</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              The Eksejabula community shares their experiences with our products.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <TestimonialCard 
-                key={index} 
-                {...testimonial} 
-                className="animate-on-scroll" 
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Instagram Feed */}
       <section className="py-20">
         <div className="container mx-auto px-4">
@@ -340,7 +361,7 @@ const Index = () => {
             {Array.from({ length: 6 }).map((_, i) => (
               <a 
                 key={i} 
-                href="https://instagram.com" 
+                href="https://www.instagram.com/eksejabula?igsh=cndqOW8zczNwdTM4&utm_source=qr" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="group relative aspect-square overflow-hidden rounded-lg animate-on-scroll"
@@ -367,7 +388,7 @@ const Index = () => {
               className="rounded-full"
             >
               <a 
-                href="https://instagram.com" 
+                href="https://www.instagram.com/eksejabula?igsh=cndqOW8zczNwdTM4&utm_source=qr" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="group"
@@ -390,16 +411,26 @@ const Index = () => {
             <p className="text-background/80 mb-8 max-w-xl mx-auto">
               Subscribe to our newsletter for exclusive offers, new releases, and creative inspiration.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
               <input 
                 type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email address" 
                 className="flex-1 px-4 py-3 rounded-md bg-background/10 border border-background/20 text-background placeholder:text-background/50 focus:outline-none focus:ring-2 focus:ring-white/30"
+                required
               />
-              <Button className="bg-white text-foreground hover:bg-white/90">
-                Subscribe
+              <Button 
+                className="bg-white text-foreground hover:bg-white/90"
+                type="submit"
+                disabled={submitting}
+              >
+                {submitting ? 'Subscribing...' : 'Subscribe'}
               </Button>
-            </div>
+            </form>
+            {submitMessage && (
+              <p className="mt-4 text-sm text-background/90">{submitMessage}</p>
+            )}
           </div>
         </div>
       </section>
