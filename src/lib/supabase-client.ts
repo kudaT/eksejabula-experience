@@ -1,9 +1,8 @@
-
 import { createClient } from '@supabase/supabase-js';
 
-// Public facing Supabase URL and anon key - safe to include in client code
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Use the same values as in src/integrations/supabase/client.ts
+const supabaseUrl = "https://iqwbqadqqkdndxdlbwrr.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlxd2JxYWRxcWtkbmR4ZGxid3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MzM5NTAsImV4cCI6MjA1ODQwOTk1MH0.LgyhHWzSbSK-QnRLkjrL5zRSjeF_182x9JBQnUkPScc";
 
 // Types for your Supabase database
 export type Profile = {
@@ -109,7 +108,13 @@ export const supabase = createClient<{
       };
     };
   };
-}>(supabaseUrl, supabaseAnonKey);
+}>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    storageKey: 'supabase.auth.token',
+  }
+});
 
 // Authentication helpers
 export const signInWithEmail = async (email: string, password: string) => {
