@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Search, Calendar, User, Clock } from 'lucide-react';
@@ -47,7 +46,7 @@ const blogPosts = [
   {
     id: '4',
     title: 'The Art of Sustainable Fashion: Our Approach',
-    excerpt: 'Sustainability is at the core of our business. Learn about our eco-friendly practices and how we're working to reduce our environmental footprint.',
+    excerpt: "Sustainability is at the core of our business. Learn about our eco-friendly practices and how we're working to reduce our environmental footprint.",
     coverImage: 'https://images.unsplash.com/photo-1550919559-2256f4b083a4',
     date: 'June 5, 2023',
     author: 'Emma Thompson',
