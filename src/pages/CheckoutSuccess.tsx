@@ -1,87 +1,67 @@
-
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { CheckCircle, Loader2, ShoppingBag } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import Layout from '@/components/layout/Layout';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import MetaTags from '@/components/seo/MetaTags';
-
-interface OrderDetails {
-  id: string;
-  status: string;
-  total_price: number;
-  created_at: string;
-}
+import { formatCurrency } from '@/lib/utils';
 
 const CheckoutSuccess = () => {
-  const [loading, setLoading] = useState(true);
-  const [order, setOrder] = useState<OrderDetails | null>(null);
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const { toast } = useToast();
-  
-  // Get order ID from URL query parameter
-  const query = new URLSearchParams(location.search);
-  const orderId = query.get('order_id');
-  const reference = query.get('reference');
-  
+  const [loading, setLoading] = useState(true);
+  const [order, setOrder] = useState(null);
+  const [error, setError] = useState('');
+
+  const reference = searchParams.get('reference');
+  const sessionId = searchParams.get('session_id');
+
   useEffect(() => {
-    // If no order ID is provided, redirect to home
-    if (!orderId) {
-      navigate('/');
-      return;
-    }
-    
     const verifyPayment = async () => {
       try {
         setLoading(true);
         
-        // Fetch order details
-        const { data: orderData, error: orderError } = await supabase
-          .from('orders')
-          .select('id, status, total_price, created_at')
-          .eq('id', orderId)
-          .single();
-        
-        if (orderError) {
-          throw new Error('Order not found');
+        if (!reference && !sessionId) {
+          setError('Invalid payment reference');
+          setLoading(false);
+          return;
         }
         
-        setOrder(orderData);
-        
-        // If payment reference is present and order status is still pending,
-        // verify the payment by calling verification endpoint
-        if (reference && orderData.status === 'pending') {
-          await supabase.functions.invoke('payment-verify', {
-            body: { reference, orderId }
-          });
-          
-          // Refresh order data to get updated status
-          const { data: updatedOrder } = await supabase
-            .from('orders')
-            .select('id, status, total_price, created_at')
-            .eq('id', orderId)
-            .single();
-            
-          if (updatedOrder) {
-            setOrder(updatedOrder);
+        // Verify the payment with our backend
+        const { data, error } = await supabase.functions.invoke('verify-payment', {
+          body: { 
+            reference,
+            sessionId
           }
+        });
+        
+        if (error) {
+          throw new Error(error.message);
         }
+        
+        if (!data.success) {
+          throw new Error(data.message || 'Payment verification failed');
+        }
+        
+        setOrder(data.order);
         
         // Show success toast
         toast({
-          title: "Order Confirmed",
-          description: "Thank you for your purchase!",
+          title: 'Payment Successful',
+          description: 'Your order has been confirmed!',
         });
         
-      } catch (error) {
-        console.error('Error verifying payment:', error);
+      } catch (err) {
+        console.error('Payment verification error:', err);
+        setError(err.message || 'Failed to verify payment');
+        
         toast({
-          title: "Error Verifying Payment",
-          description: "There was an issue confirming your payment.",
-          variant: "destructive"
+          variant: 'destructive',
+          title: 'Payment Verification Failed',
+          description: err.message || 'There was a problem verifying your payment',
         });
       } finally {
         setLoading(false);
@@ -89,72 +69,113 @@ const CheckoutSuccess = () => {
     };
     
     verifyPayment();
-  }, [orderId, reference, navigate, toast]);
-
-  return (
-    <Layout>
-      <MetaTags
-        title="Order Confirmation | Eksejabula"
-        description="Thank you for your purchase at Eksejabula. Your order has been confirmed."
-        type="website"
-      />
-      
-      <div className="container max-w-4xl py-16 px-4 min-h-[60vh] flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md text-center">
-          {loading ? (
-            <div className="flex flex-col items-center">
-              <Loader2 className="h-16 w-16 text-primary animate-spin mb-4" />
-              <h2 className="text-2xl font-bold mb-2">Confirming Your Order</h2>
-              <p className="text-muted-foreground">Please wait while we confirm your payment...</p>
-            </div>
-          ) : order ? (
-            <div className="flex flex-col items-center">
-              <div className="bg-green-100 p-4 rounded-full mb-6">
-                <CheckCircle className="h-16 w-16 text-green-600" />
-              </div>
-              
-              <h1 className="text-3xl font-bold mb-2">Thank You!</h1>
-              <p className="text-xl mb-6">Your order has been confirmed</p>
-              
-              <div className="bg-gray-50 rounded-md p-4 w-full mb-6">
-                <p className="text-sm text-muted-foreground mb-1">Order Number</p>
-                <p className="font-medium">{orderId?.substring(0, 8).toUpperCase()}</p>
-                
-                <div className="my-3 border-t border-gray-200"></div>
-                
-                <p className="text-sm text-muted-foreground mb-1">Order Status</p>
-                <p className="font-medium capitalize">{order.status}</p>
-                
-                <div className="my-3 border-t border-gray-200"></div>
-                
-                <p className="text-sm text-muted-foreground mb-1">Total Amount</p>
-                <p className="font-medium">R{parseFloat(order.total_price).toFixed(2)}</p>
-              </div>
-              
-              <p className="text-muted-foreground mb-6">
-                A confirmation email has been sent to your email address.
-              </p>
-              
-              <div className="flex gap-4">
-                <Button variant="outline" onClick={() => navigate('/shop')}>
-                  <ShoppingBag className="mr-2 h-4 w-4" />
-                  Continue Shopping
-                </Button>
-                <Button onClick={() => navigate('/account/orders')}>
-                  View Order
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center">
-              <h2 className="text-2xl font-bold mb-4">Order Not Found</h2>
-              <p className="mb-6">We couldn't find the order you're looking for.</p>
-              <Button onClick={() => navigate('/')}>Return to Home</Button>
-            </div>
-          )}
-        </div>
+  }, [reference, sessionId, toast]);
+  
+  const handleContinueShopping = () => {
+    navigate('/shop');
+  };
+  
+  const handleViewOrder = () => {
+    navigate('/account?tab=orders');
+  };
+  
+  if (loading) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center p-4">
+        <MetaTags 
+          title="Processing Payment | Eksejabula"
+          description="We're processing your payment, please wait..."
+        />
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle>Processing Payment</CardTitle>
+            <CardDescription>Please wait while we verify your payment</CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-center py-10">
+            <Loader2 className="h-16 w-16 animate-spin text-primary" />
+          </CardContent>
+        </Card>
       </div>
-    </Layout>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center p-4">
+        <MetaTags 
+          title="Payment Failed | Eksejabula"
+          description="There was an issue with your payment"
+        />
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-destructive">Payment Failed</CardTitle>
+            <CardDescription>{error}</CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p>Please try again or contact our support team for assistance.</p>
+          </CardContent>
+          <CardFooter className="flex justify-center gap-4">
+            <Button onClick={handleContinueShopping}>Continue Shopping</Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center p-4">
+      <MetaTags 
+        title="Order Confirmed | Eksejabula"
+        description="Your order has been successfully placed"
+      />
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-success">Order Confirmed!</CardTitle>
+          <CardDescription>Thank you for your purchase</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {order && (
+            <>
+              <div className="rounded-lg bg-muted p-4">
+                <p className="font-medium">Order #{order.id}</p>
+                <p className="text-sm text-muted-foreground">Placed on {new Date(order.created_at).toLocaleDateString()}</p>
+              </div>
+              
+              <div className="space-y-2">
+                <h3 className="font-medium">Order Summary</h3>
+                <div className="rounded-md border">
+                  {order.items.map((item) => (
+                    <div key={item.id} className="flex items-center justify-between border-b p-3 last:border-0">
+                      <div className="flex items-center gap-3">
+                        {item.image && (
+                          <div className="h-12 w-12 overflow-hidden rounded-md">
+                            <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                          </div>
+                        )}
+                        <div>
+                          <p className="font-medium">{item.name}</p>
+                          <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                        </div>
+                      </div>
+                      <p>{formatCurrency(item.price)}</p>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="flex justify-between pt-2">
+                  <p className="font-medium">Total</p>
+                  <p className="font-bold">{formatCurrency(String(order.total))}</p>
+                </div>
+              </div>
+            </>
+          )}
+        </CardContent>
+        <CardFooter className="flex justify-center gap-4">
+          <Button variant="outline" onClick={handleContinueShopping}>Continue Shopping</Button>
+          <Button onClick={handleViewOrder}>View Order</Button>
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
 

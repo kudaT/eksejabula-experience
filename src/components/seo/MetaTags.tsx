@@ -25,13 +25,13 @@ const MetaTags = ({
   keywords,
   author = 'Eksejabula',
 }: MetaTagsProps) => {
-  // Make sure image URL is absolute
-  const imageUrl = image.startsWith('http') 
-    ? image 
-    : `${window.location.protocol}//${window.location.host}${image}`;
+  // Make sure image URL is absolute when in browser context
+  const imageUrl = typeof window !== 'undefined' 
+    ? (image.startsWith('http') ? image : `${window.location.protocol}//${window.location.host}${image}`)
+    : image.startsWith('http') ? image : `https://eksejabula.com${image}`;
   
-  // Default canonical URL is current page
-  const canonicalUrl = canonical || window.location.href;
+  // Default canonical URL
+  const canonicalUrl = canonical || (typeof window !== 'undefined' ? window.location.href : '');
 
   return (
     <Helmet>
@@ -39,14 +39,14 @@ const MetaTags = ({
       <title>{title}</title>
       <meta name="description" content={description} />
       {keywords && <meta name="keywords" content={keywords.join(', ')} />}
-      <link rel="canonical" href={canonicalUrl} />
+      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 
       {/* Open Graph tags */}
       <meta property="og:site_name" content="Eksejabula" />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={imageUrl} />
-      <meta property="og:url" content={canonicalUrl} />
+      {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
       <meta property="og:type" content={type} />
       {publishedTime && <meta property="article:published_time" content={publishedTime} />}
       {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}

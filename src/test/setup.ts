@@ -1,5 +1,5 @@
 
-import { expect, afterEach } from 'vitest';
+import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import matchers from '@testing-library/jest-dom/matchers';
 
@@ -49,15 +49,16 @@ Object.defineProperty(window, 'scrollTo', {
 
 // Mock IntersectionObserver
 class MockIntersectionObserver {
-  constructor(callback) {
-    this.callback = callback;
-  }
   observe = vi.fn();
   unobserve = vi.fn();
   disconnect = vi.fn();
+  
+  constructor(callback) {
+    this.callback = callback;
+  }
 }
 
-window.IntersectionObserver = MockIntersectionObserver;
+window.IntersectionObserver = MockIntersectionObserver as any;
 
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
