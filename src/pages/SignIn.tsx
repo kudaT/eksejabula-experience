@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { Mail, Phone, Eye, EyeOff, Lock, Facebook, Apple } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,10 +8,16 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
+import { signInWithEmail, signUpWithEmail, signInWithOAuth } from '@/lib/supabase-client';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
 
 const SignIn = () => {
   const [searchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') === 'register' ? 'register' : 'signin';
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { session } = useAuth();
   
   const [activeTab, setActiveTab] = useState(initialTab);
   const [showPassword, setShowPassword] = useState(false);
@@ -25,52 +31,127 @@ const SignIn = () => {
   const [name, setName] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSignIn = (e: React.FormEvent) => {
+  // Redirect if already authenticated
+  if (session) {
+    navigate('/');
+    return null;
+  }
+
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!password || (loginMethod === 'email' && !email) || (loginMethod === 'phone' && !phone)) {
+      toast({
+        title: "Missing fields",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     
-    // Simulate authentication
-    setTimeout(() => {
-      console.log('Signing in with:', {
-        method: loginMethod,
-        credential: loginMethod === 'email' ? email : phone,
-        password,
-        rememberMe
-      });
-      setIsLoading(false);
+    try {
+      const credential = loginMethod === 'email' ? email : phone;
       
-      // Redirect to home or dashboard in a real app
-    }, 1500);
+      if (loginMethod === 'email') {
+        const { error } = await signInWithEmail(email, password);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "You have been successfully signed in",
+        });
+        
+        navigate('/');
+      } else {
+        // Phone authentication is not implemented yet
+        toast({
+          title: "Not implemented",
+          description: "Phone authentication is not implemented yet",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      console.error('Error signing in:', error);
+      toast({
+        title: "Authentication failed",
+        description: error.message || "Failed to sign in. Please check your credentials.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!name || !password || (loginMethod === 'email' && !email) || (loginMethod === 'phone' && !phone)) {
+      toast({
+        title: "Missing fields",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     
-    // Simulate registration
-    setTimeout(() => {
-      console.log('Registering with:', {
-        name,
-        method: loginMethod,
-        credential: loginMethod === 'email' ? email : phone,
-        password,
+    try {
+      if (loginMethod === 'email') {
+        const { error } = await signUpWithEmail(email, password, name);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Account created",
+          description: "Your account has been created successfully. Please check your email to confirm your account.",
+        });
+        
+        // Switch to sign in tab
+        setActiveTab('signin');
+      } else {
+        // Phone registration is not implemented yet
+        toast({
+          title: "Not implemented",
+          description: "Phone registration is not implemented yet",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      console.error('Error registering:', error);
+      toast({
+        title: "Registration failed",
+        description: error.message || "Failed to create account. Please try again.",
+        variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
-      
-      // Show success or redirect in a real app
-    }, 1500);
+    }
   };
 
-  const handleSocialAuth = (provider: string) => {
+  const handleSocialAuth = async (provider: 'google' | 'facebook' | 'apple') => {
     setIsLoading(true);
     
-    // Simulate social authentication
-    setTimeout(() => {
-      console.log(`Authenticating with ${provider}`);
-      setIsLoading(false);
+    try {
+      const { error } = await signInWithOAuth(provider);
       
-      // Redirect after social auth in a real app
-    }, 1500);
+      if (error) throw error;
+      
+      // The redirect will happen automatically
+      toast({
+        title: "Redirecting",
+        description: `Redirecting to ${provider} for authentication`,
+      });
+    } catch (error: any) {
+      console.error(`Error with ${provider} auth:`, error);
+      toast({
+        title: "Authentication failed",
+        description: error.message || `Failed to authenticate with ${provider}`,
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
   };
 
   return (
