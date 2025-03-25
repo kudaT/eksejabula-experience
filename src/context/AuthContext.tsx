@@ -4,6 +4,7 @@ import { Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/lib/supabase-client';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 // Helper function to get user profile
 async function getUserProfile(userId: string) {
@@ -29,8 +30,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // Handle auth callback from email confirmation
+    const handleAuthRedirect = async () => {
+      const { hash } = window.location;
+      
+      if (hash && hash.includes('error=')) {
+        const errorParams = new URLSearchParams(hash.substring(1));
+        const errorMessage = errorParams.get('error_description');
+        
+        if (errorMessage) {
+          toast({
+            title: 'Authentication Error',
+            description: errorMessage.replace(/\+/g, ' '),
+            variant: 'destructive',
+          });
+        }
+        
+        // Clean up the URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        navigate('/sign-in');
+      } else if (hash && hash.includes('access_token=')) {
+        // Process the successful auth callback
+        const { data, error } = await supabase.auth.getUser();
+        if (error) {
+          toast({
+            title: 'Authentication Error',
+            description: error.message,
+            variant: 'destructive',
+          });
+        } else if (data?.user) {
+          toast({
+            title: 'Success',
+            description: 'You have been successfully signed in.',
+          });
+          navigate('/');
+        }
+        
+        // Clean up the URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    };
+    
+    handleAuthRedirect();
+    
     // First set up the auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
@@ -57,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [toast, navigate]);
 
   async function fetchUserProfile(userId: string) {
     try {
@@ -90,6 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         title: 'Signed out',
         description: 'You have been successfully signed out.',
       });
+      navigate('/');
     } catch (error) {
       console.error('Error signing out:', error);
       toast({

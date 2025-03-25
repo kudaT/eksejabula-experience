@@ -26,6 +26,7 @@ import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminBlog from "./pages/admin/AdminBlog";
+import AuthCallback from "./pages/AuthCallback";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,11 +40,11 @@ const queryClient = new QueryClient({
 const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+      <BrowserRouter>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
             <Analytics gaId="G-XXXXXXXXXX" plausibleDomain="eksejabula.com" />
             <Routes>
               {/* Public Routes */}
@@ -56,6 +57,7 @@ const App = () => (
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/unauthorized" element={<Layout><Unauthorized /></Layout>} />
               <Route path="/checkout/success" element={<CheckoutSuccess />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
               
               {/* Customer Routes (must be authenticated) */}
               <Route path="/account" element={
@@ -79,9 +81,9 @@ const App = () => (
               
               <Route path="*" element={<Layout><NotFound /></Layout>} />
             </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
+          </TooltipProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   </HelmetProvider>
 );
