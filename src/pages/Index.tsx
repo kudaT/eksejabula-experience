@@ -1,11 +1,11 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, TrendingUp, ShieldCheck, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn, subscribeToNewsletter } from '@/lib/utils';
 import HeroSection from '@/components/ui-custom/HeroSection';
 import ProductCard from '@/components/ui-custom/ProductCard';
+import InstagramFeed from '@/components/ui-custom/InstagramFeed';
 
 // Sample product data
 const featuredProducts = [
@@ -84,20 +84,13 @@ const Index = () => {
     setSubmitting(true);
     
     try {
-      // Send to subscribe endpoint
-      const response = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
+      const result = await subscribeToNewsletter(email);
       
-      if (response.ok) {
+      if (result.success) {
         setEmail('');
-        setSubmitMessage('Thank you for subscribing!');
+        setSubmitMessage(result.message);
       } else {
-        setSubmitMessage('Something went wrong. Please try again.');
+        setSubmitMessage(result.message || 'Something went wrong. Please try again.');
       }
     } catch (error) {
       console.error('Subscription error:', error);
@@ -357,28 +350,7 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <a 
-                key={i} 
-                href="https://www.instagram.com/eksejabula?igsh=cndqOW8zczNwdTM4&utm_source=qr" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="group relative aspect-square overflow-hidden rounded-lg animate-on-scroll"
-              >
-                <img 
-                  src={`https://source.unsplash.com/random/600x600?fashion&sig=${i}`} 
-                  alt="Instagram post" 
-                  className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/30 transition-all duration-300 flex items-center justify-center">
-                  <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-medium">
-                    View Post
-                  </span>
-                </div>
-              </a>
-            ))}
-          </div>
+          <InstagramFeed postCount={6} />
           
           <div className="text-center mt-10">
             <Button 
