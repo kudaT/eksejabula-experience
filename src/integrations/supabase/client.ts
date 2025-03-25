@@ -15,6 +15,5 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     autoRefreshToken: true,
     storageKey: 'eksejabula.auth.token', // Use app-specific key to avoid conflicts
     flowType: 'pkce', // Using PKCE flow for better security
-    redirectTo: 'https://eksejabula.co.za/auth/callback', // Update this to your production domain
   }
 });

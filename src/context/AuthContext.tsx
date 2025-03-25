@@ -6,7 +6,7 @@ import { Profile } from '@/lib/supabase-client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
-// Helper function to get user profile
+// Helper function to get user profile with correct types
 async function getUserProfile(userId: string) {
   return supabase
     .from('profiles')
@@ -114,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       
       if (data) {
-        setUser(data);
+        setUser(data as Profile);
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
