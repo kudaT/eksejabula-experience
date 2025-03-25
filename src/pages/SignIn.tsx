@@ -125,6 +125,7 @@ const SignIn = () => {
                         : "hover:bg-secondary"
                     )}
                     onClick={() => setLoginMethod('email')}
+                    aria-label="Use email login method"
                   >
                     Email
                   </button>
@@ -137,6 +138,7 @@ const SignIn = () => {
                         : "hover:bg-secondary"
                     )}
                     onClick={() => setLoginMethod('phone')}
+                    aria-label="Use phone login method"
                   >
                     Phone
                   </button>
@@ -203,11 +205,13 @@ const SignIn = () => {
                       type="button"
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                       onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      title={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
+                        <EyeOff className="h-4 w-4" aria-hidden="true" />
                       ) : (
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-4 w-4" aria-hidden="true" />
                       )}
                     </button>
                   </div>
@@ -218,6 +222,7 @@ const SignIn = () => {
                     id="remember-me" 
                     checked={rememberMe}
                     onCheckedChange={(checked) => setRememberMe(!!checked)}
+                    aria-label="Remember me"
                   />
                   <label
                     htmlFor="remember-me"
@@ -255,7 +260,7 @@ const SignIn = () => {
                     onClick={() => handleSocialAuth('facebook')}
                     disabled={isLoading}
                   >
-                    <Facebook className="h-4 w-4 mr-2" />
+                    <Facebook className="h-4 w-4 mr-2" aria-hidden="true" />
                     Facebook
                   </Button>
                   <Button 
@@ -287,7 +292,7 @@ const SignIn = () => {
                     onClick={() => handleSocialAuth('apple')}
                     disabled={isLoading}
                   >
-                    <Apple className="h-4 w-4 mr-2" />
+                    <Apple className="h-4 w-4 mr-2" aria-hidden="true" />
                     Apple
                   </Button>
                 </div>
@@ -320,6 +325,7 @@ const SignIn = () => {
                         : "hover:bg-secondary"
                     )}
                     onClick={() => setLoginMethod('email')}
+                    aria-label="Use email registration method"
                   >
                     Email
                   </button>
@@ -332,6 +338,7 @@ const SignIn = () => {
                         : "hover:bg-secondary"
                     )}
                     onClick={() => setLoginMethod('phone')}
+                    aria-label="Use phone registration method"
                   >
                     Phone
                   </button>
@@ -390,18 +397,25 @@ const SignIn = () => {
                       type="button"
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                       onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      title={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
+                        <EyeOff className="h-4 w-4" aria-hidden="true" />
                       ) : (
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-4 w-4" aria-hidden="true" />
                       )}
                     </button>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
-                  <Checkbox id="terms" className="mt-1" required />
+                  <Checkbox 
+                    id="terms" 
+                    className="mt-1" 
+                    required
+                    aria-label="Accept terms and conditions"
+                  />
                   <label
                     htmlFor="terms"
                     className="ml-2 text-sm text-muted-foreground"
@@ -445,7 +459,7 @@ const SignIn = () => {
                     onClick={() => handleSocialAuth('facebook')}
                     disabled={isLoading}
                   >
-                    <Facebook className="h-4 w-4 mr-2" />
+                    <Facebook className="h-4 w-4 mr-2" aria-hidden="true" />
                     Facebook
                   </Button>
                   <Button 
@@ -477,7 +491,7 @@ const SignIn = () => {
                     onClick={() => handleSocialAuth('apple')}
                     disabled={isLoading}
                   >
-                    <Apple className="h-4 w-4 mr-2" />
+                    <Apple className="h-4 w-4 mr-2" aria-hidden="true" />
                     Apple
                   </Button>
                 </div>
