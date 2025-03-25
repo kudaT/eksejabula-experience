@@ -1,8 +1,18 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Session } from '@supabase/supabase-js';
-import { supabase, Profile, getUserProfile } from '@/lib/supabase-client';
+import { supabase } from '@/integrations/supabase/client';
+import { Profile } from '@/lib/supabase-client';
 import { useToast } from '@/hooks/use-toast';
+
+// Helper function to get user profile
+async function getUserProfile(userId: string) {
+  return supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+}
 
 type AuthContextType = {
   session: Session | null;
