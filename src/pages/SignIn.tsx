@@ -1,16 +1,13 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
-import { Mail, Phone, Eye, EyeOff, Lock, Facebook, Apple } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Checkbox } from '@/components/ui/checkbox';
-import { cn } from '@/lib/utils';
-import { signInWithEmail, signUpWithEmail, signInWithOAuth } from '@/lib/supabase-client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
+import { SignInForm } from '@/components/auth/SignInForm';
+import { RegisterForm } from '@/components/auth/RegisterForm';
+import { SocialAuth } from '@/components/auth/SocialAuth';
 
 const SignIn = () => {
   const [searchParams] = useSearchParams();
@@ -20,26 +17,17 @@ const SignIn = () => {
   const { session } = useAuth();
   
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [showPassword, setShowPassword] = useState(false);
-  const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
   const [isLoading, setIsLoading] = useState(false);
   
-  // Form states
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
-
   // Redirect if already authenticated
-  if (session) {
-    navigate('/');
-    return null;
-  }
+  useEffect(() => {
+    if (session) {
+      navigate('/');
+    }
+  }, [session, navigate]);
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!password || (loginMethod === 'email' && !email) || (loginMethod === 'phone' && !phone)) {
+  const handleSignIn = async (email: string, password: string, rememberMe: boolean) => {
+    if (!email || !password) {
       toast({
         title: "Missing fields",
         description: "Please fill in all required fields",
@@ -51,27 +39,21 @@ const SignIn = () => {
     setIsLoading(true);
     
     try {
-      const credential = loginMethod === 'email' ? email : phone;
+      console.log("Signing in with:", { method: 'email', credential: email, password, rememberMe });
       
-      if (loginMethod === 'email') {
-        const { error } = await signInWithEmail(email, password);
-        
-        if (error) throw error;
-        
-        toast({
-          title: "Success",
-          description: "You have been successfully signed in",
-        });
-        
-        navigate('/');
-      } else {
-        // Phone authentication is not implemented yet
-        toast({
-          title: "Not implemented",
-          description: "Phone authentication is not implemented yet",
-          variant: "destructive",
-        });
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: "You have been successfully signed in",
+      });
+      
+      navigate('/');
     } catch (error: any) {
       console.error('Error signing in:', error);
       toast({
@@ -84,9 +66,8 @@ const SignIn = () => {
     }
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name || !password || (loginMethod === 'email' && !email) || (loginMethod === 'phone' && !phone)) {
+  const handleRegister = async (name: string, email: string, password: string) => {
+    if (!name || !email || !password) {
       toast({
         title: "Missing fields",
         description: "Please fill in all required fields",
@@ -98,26 +79,25 @@ const SignIn = () => {
     setIsLoading(true);
     
     try {
-      if (loginMethod === 'email') {
-        const { error } = await signUpWithEmail(email, password, name);
-        
-        if (error) throw error;
-        
-        toast({
-          title: "Account created",
-          description: "Your account has been created successfully. Please check your email to confirm your account.",
-        });
-        
-        // Switch to sign in tab
-        setActiveTab('signin');
-      } else {
-        // Phone registration is not implemented yet
-        toast({
-          title: "Not implemented",
-          description: "Phone registration is not implemented yet",
-          variant: "destructive",
-        });
-      }
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name,
+          }
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Account created",
+        description: "Your account has been created successfully. Please check your email to confirm your account.",
+      });
+      
+      // Switch to sign in tab
+      setActiveTab('signin');
     } catch (error: any) {
       console.error('Error registering:', error);
       toast({
@@ -134,7 +114,12 @@ const SignIn = () => {
     setIsLoading(true);
     
     try {
-      const { error } = await signInWithOAuth(provider);
+      const { error } = await supabase.auth.signInWithOAuth({ 
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        }
+      });
       
       if (error) throw error;
       
@@ -153,6 +138,11 @@ const SignIn = () => {
       setIsLoading(false);
     }
   };
+
+  // If already authenticated, don't render the sign-in form
+  if (session) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen pt-16 pb-12 flex items-center justify-center">
@@ -194,388 +184,30 @@ const SignIn = () => {
             </TabsList>
             
             <TabsContent value="signin" className="animate-fade-in">
-              <form onSubmit={handleSignIn} className="space-y-6">
-                {/* Auth Method Selector */}
-                <div className="flex border rounded-md p-1">
-                  <button
-                    type="button"
-                    className={cn(
-                      "flex-1 text-sm font-medium py-2 rounded-md transition-colors",
-                      loginMethod === 'email' 
-                        ? "bg-foreground text-background" 
-                        : "hover:bg-secondary"
-                    )}
-                    onClick={() => setLoginMethod('email')}
-                    aria-label="Use email login method"
-                  >
-                    Email
-                  </button>
-                  <button
-                    type="button"
-                    className={cn(
-                      "flex-1 text-sm font-medium py-2 rounded-md transition-colors",
-                      loginMethod === 'phone' 
-                        ? "bg-foreground text-background" 
-                        : "hover:bg-secondary"
-                    )}
-                    onClick={() => setLoginMethod('phone')}
-                    aria-label="Use phone login method"
-                  >
-                    Phone
-                  </button>
-                </div>
-                
-                {/* Email/Phone Input */}
-                {loginMethod === 'email' ? (
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="your@email.com"
-                        className="pl-10"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="+27 71 234 5678"
-                        className="pl-10"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                )}
-                
-                {/* Password Input */}
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Link 
-                      to="/forgot-password" 
-                      className="text-sm text-accent hover:underline"
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      className="pl-10"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                      onClick={() => setShowPassword(!showPassword)}
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                      title={showPassword ? "Hide password" : "Show password"}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" aria-hidden="true" />
-                      ) : (
-                        <Eye className="h-4 w-4" aria-hidden="true" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="flex items-center">
-                  <Checkbox 
-                    id="remember-me" 
-                    checked={rememberMe}
-                    onCheckedChange={(checked) => setRememberMe(!!checked)}
-                    aria-label="Remember me"
-                  />
-                  <label
-                    htmlFor="remember-me"
-                    className="ml-2 text-sm text-muted-foreground"
-                  >
-                    Remember me
-                  </label>
-                </div>
-                
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Signing in..." : "Sign In"}
-                </Button>
-              </form>
+              <SignInForm 
+                isLoading={isLoading}
+                onSignIn={handleSignIn}
+              />
               
               <div className="mt-6">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
-                      Or continue with
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-3 mt-6">
-                  <Button 
-                    variant="outline" 
-                    className="bg-[#1877F2] hover:bg-[#1877F2]/90 text-white border-none"
-                    onClick={() => handleSocialAuth('facebook')}
-                    disabled={isLoading}
-                  >
-                    <Facebook className="h-4 w-4 mr-2" aria-hidden="true" />
-                    Facebook
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="bg-white text-black hover:bg-gray-100 border-gray-300"
-                    onClick={() => handleSocialAuth('google')}
-                    disabled={isLoading}
-                  >
-                    <svg
-                      className="h-4 w-4 mr-2"
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fab"
-                      data-icon="google"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 488 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
-                      ></path>
-                    </svg>
-                    Google
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="bg-black text-white hover:bg-gray-800 border-none"
-                    onClick={() => handleSocialAuth('apple')}
-                    disabled={isLoading}
-                  >
-                    <Apple className="h-4 w-4 mr-2" aria-hidden="true" />
-                    Apple
-                  </Button>
-                </div>
+                <SocialAuth
+                  isLoading={isLoading}
+                  onSocialAuth={handleSocialAuth}
+                />
               </div>
             </TabsContent>
             
             <TabsContent value="register" className="animate-fade-in">
-              <form onSubmit={handleRegister} className="space-y-6">
-                {/* Full Name */}
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="Your Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                </div>
-                
-                {/* Auth Method Selector */}
-                <div className="flex border rounded-md p-1">
-                  <button
-                    type="button"
-                    className={cn(
-                      "flex-1 text-sm font-medium py-2 rounded-md transition-colors",
-                      loginMethod === 'email' 
-                        ? "bg-foreground text-background" 
-                        : "hover:bg-secondary"
-                    )}
-                    onClick={() => setLoginMethod('email')}
-                    aria-label="Use email registration method"
-                  >
-                    Email
-                  </button>
-                  <button
-                    type="button"
-                    className={cn(
-                      "flex-1 text-sm font-medium py-2 rounded-md transition-colors",
-                      loginMethod === 'phone' 
-                        ? "bg-foreground text-background" 
-                        : "hover:bg-secondary"
-                    )}
-                    onClick={() => setLoginMethod('phone')}
-                    aria-label="Use phone registration method"
-                  >
-                    Phone
-                  </button>
-                </div>
-                
-                {/* Email/Phone Input */}
-                {loginMethod === 'email' ? (
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="reg-email"
-                        type="email"
-                        placeholder="your@email.com"
-                        className="pl-10"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-phone">Phone Number</Label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="reg-phone"
-                        type="tel"
-                        placeholder="+27 71 234 5678"
-                        className="pl-10"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                )}
-                
-                {/* Password Input */}
-                <div className="space-y-2">
-                  <Label htmlFor="reg-password">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="reg-password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      className="pl-10"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                      onClick={() => setShowPassword(!showPassword)}
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                      title={showPassword ? "Hide password" : "Show password"}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" aria-hidden="true" />
-                      ) : (
-                        <Eye className="h-4 w-4" aria-hidden="true" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <Checkbox 
-                    id="terms" 
-                    className="mt-1" 
-                    required
-                    aria-label="Accept terms and conditions"
-                  />
-                  <label
-                    htmlFor="terms"
-                    className="ml-2 text-sm text-muted-foreground"
-                  >
-                    I agree to the{" "}
-                    <Link to="/terms" className="text-accent hover:underline">
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link to="/privacy" className="text-accent hover:underline">
-                      Privacy Policy
-                    </Link>
-                  </label>
-                </div>
-                
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Creating Account..." : "Create Account"}
-                </Button>
-              </form>
+              <RegisterForm
+                isLoading={isLoading}
+                onRegister={handleRegister}
+              />
               
               <div className="mt-6">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
-                      Or register with
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-3 mt-6">
-                  <Button 
-                    variant="outline" 
-                    className="bg-[#1877F2] hover:bg-[#1877F2]/90 text-white border-none"
-                    onClick={() => handleSocialAuth('facebook')}
-                    disabled={isLoading}
-                  >
-                    <Facebook className="h-4 w-4 mr-2" aria-hidden="true" />
-                    Facebook
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="bg-white text-black hover:bg-gray-100 border-gray-300"
-                    onClick={() => handleSocialAuth('google')}
-                    disabled={isLoading}
-                  >
-                    <svg
-                      className="h-4 w-4 mr-2"
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fab"
-                      data-icon="google"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 488 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
-                      ></path>
-                    </svg>
-                    Google
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="bg-black text-white hover:bg-gray-800 border-none"
-                    onClick={() => handleSocialAuth('apple')}
-                    disabled={isLoading}
-                  >
-                    <Apple className="h-4 w-4 mr-2" aria-hidden="true" />
-                    Apple
-                  </Button>
-                </div>
+                <SocialAuth
+                  isLoading={isLoading}
+                  onSocialAuth={handleSocialAuth}
+                />
               </div>
             </TabsContent>
           </Tabs>
