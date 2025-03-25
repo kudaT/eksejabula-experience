@@ -38,7 +38,7 @@ This guide will help you deploy your React application to a cPanel server.
 
 For Supabase authentication to work correctly with your domain:
 
-1. Go to the Supabase Dashboard: https://app.supabase.com/project/iqwbqadqqkdndxdlbwrr/auth/url-configuration
+1. Go to the Supabase Dashboard > URL Configuration: https://app.supabase.com/project/iqwbqadqqkdndxdlbwrr/auth/url-configuration
 2. Update the Site URL to: `https://eksejabula.co.za`
 3. Add the following Redirect URLs:
    - `https://eksejabula.co.za/auth/callback`
@@ -49,17 +49,29 @@ For Supabase authentication to work correctly with your domain:
 
 To use your custom SMTP server (info@eksejabula.co.za) for authentication emails:
 
-1. Find your SMTP server details from your cPanel or email provider
-2. Go to the Supabase Dashboard: https://app.supabase.com/project/iqwbqadqqkdndxdlbwrr/settings/functions
-3. Add the following secrets for the auth-email function:
-   - `SMTP_HOST` (e.g., mail.eksejabula.co.za)
-   - `SMTP_PORT` (typically 587 for TLS)
-   - `SMTP_USERNAME` (usually info@eksejabula.co.za)
-   - `SMTP_PASSWORD` (your email password)
-   - `SMTP_FROM` (info@eksejabula.co.za)
+1. Go to the Supabase Dashboard > Email Templates: https://app.supabase.com/project/iqwbqadqqkdndxdlbwrr/auth/templates
+2. Choose "Custom SMTP" in the email provider dropdown
+3. Enter your SMTP credentials:
+   - SMTP Host: mail.eksejabula.co.za (or your mail server)
+   - SMTP Port: 587 (for TLS) or 465 (for SSL)
+   - SMTP Username: info@eksejabula.co.za
+   - SMTP Password: Your email password
+   - Sender Name: Eksejabula
+   - Sender Email: info@eksejabula.co.za
+4. Click "Test" to verify your configuration
+5. Save your settings
 
-4. Then go to Email Templates in the Auth section: https://app.supabase.com/project/iqwbqadqqkdndxdlbwrr/auth/templates
-5. To use the custom email function, choose "Custom SMTP" in the email provider dropdown
+### Edge Function SMTP Configuration
+
+If you're using the custom edge function for emails, also set these secrets:
+
+1. Go to the Supabase Dashboard > Edge Functions: https://app.supabase.com/project/iqwbqadqqkdndxdlbwrr/settings/functions
+2. Add the following secrets:
+   - `SMTP_HOST` (e.g., mail.eksejabula.co.za)
+   - `SMTP_PORT` (typically 587 for TLS or 465 for SSL)
+   - `SMTP_USERNAME` (info@eksejabula.co.za)
+   - `SMTP_PASSWORD` (your email password)
+   - `SMTP_FROM` (Eksejabula <info@eksejabula.co.za>)
 
 ## Setting Up the Domain
 
@@ -81,4 +93,3 @@ For Supabase connection, make sure your host supports environment variables or:
 
 1. The Supabase URL and keys are already included in the built code
 2. If you need to update them, you'll need to update the relevant files in the build
-
