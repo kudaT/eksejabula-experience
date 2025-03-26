@@ -13,19 +13,14 @@ import Shop from "./pages/Shop";
 import ProductDetail from "./pages/ProductDetail";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
-import SignIn from "./pages/SignIn";
-import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
-import Unauthorized from "./pages/Unauthorized";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminBlog from "./pages/admin/AdminBlog";
-import AuthCallback from "./pages/AuthCallback";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,24 +46,10 @@ const App = () => (
           <Route path="/product/:id" element={<Layout><ProductDetail /></Layout>} />
           <Route path="/blog" element={<Layout><Blog /></Layout>} />
           <Route path="/blog/:id" element={<Layout><BlogPost /></Layout>} />
-          <Route path="/sign-in" element={<SignIn />} />
-          <Route path="/unauthorized" element={<Layout><Unauthorized /></Layout>} />
           <Route path="/checkout/success" element={<CheckoutSuccess />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
-          
-          {/* Customer Routes (must be authenticated) */}
-          <Route path="/account" element={
-            <ProtectedRoute>
-              <Layout><Account /></Layout>
-            </ProtectedRoute>
-          } />
           
           {/* Admin Routes */}
-          <Route path="/admin" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <AdminLayout />
-            </ProtectedRoute>
-          }>
+          <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />

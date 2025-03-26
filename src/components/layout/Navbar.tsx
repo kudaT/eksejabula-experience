@@ -2,38 +2,28 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
-  Menu, X, ShoppingCart, User, ChevronDown, 
-  LogOut, Settings, Package, Home, Newspaper, ShoppingBag,
-  Shield
+  Menu, X, ShoppingCart, User, Newspaper, ShoppingBag, Home
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
   NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
+  NavigationMenuItem,
 } from "@/components/ui/navigation-menu";
 import { cn } from '@/lib/utils';
 import CartDropdown from '../ui-custom/CartDropdown';
-import { useAuth } from '@/context/AuthContext';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const location = useLocation();
-  const { user, isAdmin, signOut, loading } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -124,7 +114,7 @@ const Navbar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* User Profile */}
+            {/* Basic User Menu, No Authentication */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
@@ -136,72 +126,11 @@ const Navbar = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {user ? (
-                  <>
-                    <DropdownMenuLabel>
-                      {user.full_name ? `Hello, ${user.full_name}` : 'My Account'}
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    
-                    {isAdmin && (
-                      <DropdownMenuItem asChild>
-                        <Link 
-                          to="/admin" 
-                          className="flex items-center cursor-pointer"
-                        >
-                          <Shield className="mr-2 h-4 w-4" />
-                          <span>Admin Dashboard</span>
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    
-                    <DropdownMenuItem asChild>
-                      <Link 
-                        to="/account" 
-                        className="flex items-center cursor-pointer"
-                      >
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Account Settings</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link 
-                        to="/orders" 
-                        className="flex items-center cursor-pointer"
-                      >
-                        <Package className="mr-2 h-4 w-4" />
-                        <span>Orders</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      onClick={signOut}
-                      className="cursor-pointer"
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Sign Out</span>
-                    </DropdownMenuItem>
-                  </>
-                ) : (
-                  <>
-                    <DropdownMenuItem asChild>
-                      <Link 
-                        to="/sign-in" 
-                        className="flex items-center cursor-pointer"
-                      >
-                        <span>Sign In</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link 
-                        to="/sign-in?tab=register" 
-                        className="flex items-center cursor-pointer"
-                      >
-                        <span>Register</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  </>
-                )}
+                <DropdownMenuItem asChild>
+                  <Link to="/admin" className="cursor-pointer">
+                    Admin Dashboard
+                  </Link>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -259,37 +188,14 @@ const Navbar = () => {
               <span>Shop</span>
             </Link>
             
-            {isAdmin && (
-              <Link 
-                to="/admin" 
-                className="flex items-center space-x-2 text-lg px-2 text-primary"
-              >
-                <Shield className="h-5 w-5" />
-                <span>Admin Dashboard</span>
-              </Link>
-            )}
+            <Link 
+              to="/admin" 
+              className="flex items-center space-x-2 text-lg px-2 text-primary"
+            >
+              <User className="h-5 w-5" />
+              <span>Admin Dashboard</span>
+            </Link>
           </nav>
-
-          <div className="mt-auto pb-8 pt-4 border-t">
-            <div className="flex justify-between items-center px-2">
-              <div className="flex items-center space-x-2">
-                <User className="h-5 w-5" />
-                <span>Account</span>
-              </div>
-              {user ? (
-                <Button 
-                  variant="ghost" 
-                  onClick={signOut}
-                >
-                  Sign Out
-                </Button>
-              ) : (
-                <Link to="/sign-in">
-                  <Button>Sign In</Button>
-                </Link>
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </header>
@@ -297,4 +203,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
