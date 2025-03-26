@@ -1,9 +1,8 @@
-
 import { createClient } from '@supabase/supabase-js';
+import { getSupabaseClient } from '@/integrations/supabase/client';
 
-// Use the same values as in src/integrations/supabase/client.ts
-const supabaseUrl = "https://iqwbqadqqkdndxdlbwrr.supabase.co";
-const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlxd2JxYWRxcWtkbmR4ZGxid3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MzM5NTAsImV4cCI6MjA1ODQwOTk1MH0.LgyhHWzSbSK-QnRLkjrL5zRSjeF_182x9JBQnUkPScc";
+// Use the shared instance instead of creating a new one
+export const supabase = getSupabaseClient();
 
 // Profile Types
 export type Profile = {
@@ -178,134 +177,6 @@ export type AdminLog = {
   details: any;
   created_at: string;
 };
-
-export const supabase = createClient<{
-  public: {
-    Tables: {
-      profiles: {
-        Row: Profile;
-        Insert: Omit<Profile, 'created_at'>;
-        Update: Partial<Omit<Profile, 'id' | 'created_at'>>;
-      };
-      products: {
-        Row: Product;
-        Insert: Omit<Product, 'id' | 'created_at' | 'is_available' | 'average_rating'>;
-        Update: Partial<Omit<Product, 'id' | 'created_at' | 'is_available' | 'average_rating'>>;
-      };
-      product_variants: {
-        Row: ProductVariant;
-        Insert: Omit<ProductVariant, 'id' | 'created_at'>;
-        Update: Partial<Omit<ProductVariant, 'id' | 'created_at'>>;
-      };
-      product_customisations: {
-        Row: ProductCustomisation;
-        Insert: Omit<ProductCustomisation, 'id'>;
-        Update: Partial<Omit<ProductCustomisation, 'id'>>;
-      };
-      product_reviews: {
-        Row: ProductReview;
-        Insert: Omit<ProductReview, 'id' | 'created_at'>;
-        Update: Partial<Omit<ProductReview, 'id' | 'created_at'>>;
-      };
-      carts: {
-        Row: Cart;
-        Insert: Omit<Cart, 'id' | 'created_at' | 'updated_at'>;
-        Update: Partial<Omit<Cart, 'id' | 'created_at' | 'updated_at'>>;
-      };
-      cart_items: {
-        Row: CartItem;
-        Insert: Omit<CartItem, 'id' | 'created_at' | 'updated_at'>;
-        Update: Partial<Omit<CartItem, 'id' | 'created_at' | 'updated_at'>>;
-      };
-      wishlists: {
-        Row: Wishlist;
-        Insert: Omit<Wishlist, 'id' | 'created_at'>;
-        Update: Partial<Omit<Wishlist, 'id' | 'created_at'>>;
-      };
-      orders: {
-        Row: Order;
-        Insert: Omit<Order, 'id' | 'created_at'>;
-        Update: Partial<Omit<Order, 'id' | 'created_at'>>;
-      };
-      order_items: {
-        Row: OrderItem;
-        Insert: Omit<OrderItem, 'id'>;
-        Update: Partial<Omit<OrderItem, 'id'>>;
-      };
-      order_events: {
-        Row: OrderEvent;
-        Insert: Omit<OrderEvent, 'id' | 'created_at'>;
-        Update: Partial<Omit<OrderEvent, 'id' | 'created_at'>>;
-      };
-      shipping_addresses: {
-        Row: ShippingAddress;
-        Insert: Omit<ShippingAddress, 'id' | 'created_at'>;
-        Update: Partial<Omit<ShippingAddress, 'id' | 'created_at'>>;
-      };
-      discount_codes: {
-        Row: DiscountCode;
-        Insert: Omit<DiscountCode, 'id' | 'created_at' | 'used_count'>;
-        Update: Partial<Omit<DiscountCode, 'id' | 'created_at'>>;
-      };
-      contact_messages: {
-        Row: ContactMessage;
-        Insert: Omit<ContactMessage, 'id' | 'created_at' | 'responded'>;
-        Update: Partial<Omit<ContactMessage, 'id' | 'created_at'>>;
-      };
-      subscribers: {
-        Row: Subscriber;
-        Insert: Omit<Subscriber, 'id' | 'created_at' | 'confirmed'>;
-        Update: Partial<Omit<Subscriber, 'id' | 'created_at'>>;
-      };
-      blog_posts: {
-        Row: BlogPost;
-        Insert: Omit<BlogPost, 'id'>;
-        Update: Partial<Omit<BlogPost, 'id'>>;
-      };
-      admin_logs: {
-        Row: AdminLog;
-        Insert: Omit<AdminLog, 'id' | 'created_at'>;
-        Update: Partial<Omit<AdminLog, 'id' | 'created_at'>>;
-      };
-    };
-    Functions: {
-      promote_to_admin: {
-        Args: { user_id: string };
-        Returns: void;
-      };
-      create_order: {
-        Args: { 
-          p_user_id: string; 
-          p_items: string; // JSON string of order items
-          p_shipping_address?: string; // Optional JSON string of shipping address
-        };
-        Returns: string; // Returns the order ID
-      };
-      update_order_status: {
-        Args: { 
-          p_order_id: string;
-          p_status: 'pending' | 'paid' | 'cancelled' | 'shipped';
-          p_notes?: string;
-        };
-        Returns: void;
-      };
-      does_user_exist_with_email: {
-        Args: { email: string };
-        Returns: boolean;
-      };
-      does_user_exist_with_phone: {
-        Args: { phone: string };
-        Returns: boolean;
-      };
-    };
-  };
-}>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    storageKey: 'supabase.auth.token',
-  }
-});
 
 // ----- Authentication helpers -----
 export const signInWithEmail = async (email: string, password: string) => {

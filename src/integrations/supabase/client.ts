@@ -6,14 +6,25 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://iqwbqadqqkdndxdlbwrr.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlxd2JxYWRxcWtkbmR4ZGxid3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MzM5NTAsImV4cCI6MjA1ODQwOTk1MH0.LgyhHWzSbSK-QnRLkjrL5zRSjeF_182x9JBQnUkPScc";
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
+// Create a single instance of the Supabase client to prevent "Multiple GoTrueClient instances" warnings
+// Use a unique storage key to avoid conflicts with other applications
+let supabaseInstance = null;
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    storageKey: 'eksejabula.auth.token', // Use app-specific key to avoid conflicts
-    flowType: 'pkce', // Using PKCE flow for better security
-  }
-});
+export const getSupabaseClient = () => {
+  if (supabaseInstance) return supabaseInstance;
+
+  supabaseInstance = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      storageKey: 'eksejabula.auth.token', // Use app-specific key to avoid conflicts
+      flowType: 'pkce', // Using PKCE flow for better security
+      debug: false // Disable debug to reduce console logs
+    }
+  });
+
+  return supabaseInstance;
+};
+
+// Export the supabase client for backward compatibility
+export const supabase = getSupabaseClient();
