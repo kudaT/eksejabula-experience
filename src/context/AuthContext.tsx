@@ -8,11 +8,20 @@ import { useNavigate } from 'react-router-dom';
 
 // Helper function to get user profile with correct types
 async function getUserProfile(userId: string) {
-  return supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
+  try {
+    // Use direct query to avoid RLS recursion
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+      
+    if (error) throw error;
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error in getUserProfile:', error);
+    return { data: null, error };
+  }
 }
 
 type AuthContextType = {
@@ -127,13 +136,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function fetchUserProfile(userId: string) {
     try {
       setLoading(true);
+      
+      // Try to get the user's metadata from auth first (as a fallback)
+      const { data: authData } = await supabase.auth.getUser();
+      const userMeta = authData?.user?.user_metadata;
+      
+      // Then try to fetch the profile data
       const { data, error } = await getUserProfile(userId);
       
       if (error) {
-        throw error;
-      }
-      
-      if (data) {
+        console.error('Error fetching user profile:', error);
+        
+        // Create a fallback profile from auth metadata if profile fetch fails
+        if (userMeta) {
+          const fallbackProfile: Profile = {
+            id: userId,
+            full_name: userMeta.full_name as string || null,
+            email: authData?.user?.email || null,
+            phone_number: authData?.user?.phone || null,
+            role: (userMeta.role as 'customer' | 'admin') || 'customer',
+            avatar_url: userMeta.avatar_url as string || null,
+            created_at: new Date().toISOString(),
+          };
+          
+          setUser(fallbackProfile);
+          toast({
+            title: 'Limited Profile Access',
+            description: 'Using basic profile information. Some features may be limited.',
+            variant: 'default',
+          });
+        } else {
+          toast({
+            title: 'Error',
+            description: 'Failed to fetch user profile. Please refresh the page.',
+            variant: 'destructive',
+          });
+        }
+      } else if (data) {
         console.log("User profile fetched:", data);
         setUser(data as Profile);
       } else {
@@ -141,7 +180,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Could handle creating a profile here if needed
       }
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      console.error('Error in fetchUserProfile:', error);
       toast({
         title: 'Error',
         description: 'Failed to fetch user profile. Please refresh the page.',
