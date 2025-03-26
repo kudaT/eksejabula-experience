@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         // Clean up the URL
         window.history.replaceState({}, document.title, window.location.pathname);
-        navigate('/sign-in');
+        navigate('/auth');
         return;
       } 
       
@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         // Clean up the URL
         window.history.replaceState({}, document.title, window.location.pathname);
-        navigate('/sign-in');
+        navigate('/auth');
       }
     };
     

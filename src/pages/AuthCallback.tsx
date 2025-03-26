@@ -30,7 +30,7 @@ const AuthCallback = () => {
             variant: 'destructive',
           });
           
-          setTimeout(() => navigate('/sign-in'), 2000);
+          setTimeout(() => navigate('/auth'), 2000);
           return;
         }
         
@@ -46,7 +46,7 @@ const AuthCallback = () => {
             variant: 'destructive',
           });
           
-          setTimeout(() => navigate('/sign-in'), 2000);
+          setTimeout(() => navigate('/auth'), 2000);
           return;
         }
         
@@ -67,7 +67,7 @@ const AuthCallback = () => {
             description: error.message,
             variant: 'destructive',
           });
-          setTimeout(() => navigate('/sign-in'), 2000);
+          setTimeout(() => navigate('/auth'), 2000);
         } else if (data?.session) {
           console.log("Authentication successful, session established");
           toast({
@@ -79,7 +79,7 @@ const AuthCallback = () => {
           // No session, redirect to sign-in
           console.warn("No session found after auth callback");
           setError('No session established');
-          setTimeout(() => navigate('/sign-in'), 2000);
+          setTimeout(() => navigate('/auth'), 2000);
         }
       } catch (err) {
         console.error("Unexpected error in auth callback:", err);
@@ -89,7 +89,7 @@ const AuthCallback = () => {
           description: 'An unexpected error occurred during authentication.',
           variant: 'destructive',
         });
-        setTimeout(() => navigate('/sign-in'), 2000);
+        setTimeout(() => navigate('/auth'), 2000);
       } finally {
         setIsProcessing(false);
       }

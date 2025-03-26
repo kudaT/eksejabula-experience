@@ -17,7 +17,7 @@ const Unauthorized = () => {
         title: "Signed out successfully",
         description: "You have been signed out"
       });
-      navigate('/sign-in');
+      navigate('/auth');
     } catch (error) {
       console.error('Error signing out:', error);
       toast({
@@ -62,7 +62,7 @@ const Unauthorized = () => {
             </Button>
           ) : (
             <Button asChild variant="default">
-              <Link to="/sign-in">Sign In</Link>
+              <Link to="/auth">Sign In</Link>
             </Button>
           )}
         </div>
