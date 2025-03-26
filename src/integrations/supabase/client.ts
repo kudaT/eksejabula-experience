@@ -20,7 +20,7 @@ export const getSupabaseClient = () => {
       storageKey: 'eksejabula.auth.token', // Use app-specific key to avoid conflicts
       flowType: 'pkce', // Using PKCE flow for better security
       detectSessionInUrl: true, // Enable detection of auth params in URL
-      debug: process.env.NODE_ENV === 'development' // Only enable debug in development
+      debug: false // Disable debug to avoid console logs
     }
   });
 

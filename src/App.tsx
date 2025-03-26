@@ -26,6 +26,7 @@ import AdminBlog from "./pages/admin/AdminBlog";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import Unauthorized from "./pages/Unauthorized";
+import UserDashboard from "./pages/UserDashboard";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,6 +59,13 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/auth-callback" element={<AuthCallback />} />
             <Route path="/unauthorized" element={<Layout><Unauthorized /></Layout>} />
+            
+            {/* User Dashboard - Protected */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Layout><UserDashboard /></Layout>
+              </ProtectedRoute>
+            } />
             
             {/* Admin Routes - Protected */}
             <Route path="/admin" element={

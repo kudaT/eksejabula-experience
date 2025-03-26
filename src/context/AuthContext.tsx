@@ -55,7 +55,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const errorMessage = errorParams.get('error_description');
         
         if (errorMessage) {
-          console.error('Auth error from hash:', errorMessage);
           toast({
             title: 'Authentication Error',
             description: errorMessage.replace(/\+/g, ' '),
@@ -75,7 +74,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const errorMessage = errorParams.get('error_description');
         
         if (errorMessage) {
-          console.error('Auth error from search:', errorMessage);
           toast({
             title: 'Authentication Error',
             description: errorMessage.replace(/\+/g, ' '),
@@ -94,8 +92,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // First set up the auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
-        console.log("Auth state changed:", event, newSession?.user?.id);
-        
         // Update the session state
         setSession(newSession);
         
@@ -114,8 +110,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Then check for existing session
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      console.log("Initial session check:", currentSession?.user?.id);
-      
       // Update the session state
       setSession(currentSession);
       
@@ -145,8 +139,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await getUserProfile(userId);
       
       if (error) {
-        console.error('Error fetching user profile:', error);
-        
         // Create a fallback profile from auth metadata if profile fetch fails
         if (userMeta) {
           const fallbackProfile: Profile = {
@@ -173,14 +165,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
         }
       } else if (data) {
-        console.log("User profile fetched:", data);
         setUser(data as Profile);
       } else {
-        console.warn("No user profile found for user ID:", userId);
         // Could handle creating a profile here if needed
+        toast({
+          title: 'Profile Not Found',
+          description: 'Your user profile could not be found.',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
-      console.error('Error in fetchUserProfile:', error);
       toast({
         title: 'Error',
         description: 'Failed to fetch user profile. Please refresh the page.',
@@ -201,7 +195,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       navigate('/');
     } catch (error) {
-      console.error('Error signing out:', error);
       toast({
         title: 'Error',
         description: 'Failed to sign out. Please try again.',
