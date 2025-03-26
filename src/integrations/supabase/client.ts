@@ -19,7 +19,8 @@ export const getSupabaseClient = () => {
       autoRefreshToken: true,
       storageKey: 'eksejabula.auth.token', // Use app-specific key to avoid conflicts
       flowType: 'pkce', // Using PKCE flow for better security
-      debug: false // Disable debug to reduce console logs
+      detectSessionInUrl: true, // Enable detection of auth params in URL
+      debug: process.env.NODE_ENV === 'development' // Only enable debug in development
     }
   });
 

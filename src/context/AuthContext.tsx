@@ -33,15 +33,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Set loading true at the start of the auth check
+    setLoading(true);
+    
     // Handle auth callback from email confirmation
     const handleAuthRedirect = async () => {
-      const { hash } = window.location;
+      const { hash, search } = window.location;
       
+      // Check for error in hash parameters (from OAuth or email link)
       if (hash && hash.includes('error=')) {
         const errorParams = new URLSearchParams(hash.substring(1));
         const errorMessage = errorParams.get('error_description');
         
         if (errorMessage) {
+          console.error('Auth error from hash:', errorMessage);
           toast({
             title: 'Authentication Error',
             description: errorMessage.replace(/\+/g, ' '),
@@ -52,25 +57,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Clean up the URL
         window.history.replaceState({}, document.title, window.location.pathname);
         navigate('/sign-in');
-      } else if (hash && hash.includes('access_token=')) {
-        // Process the successful auth callback
-        const { data, error } = await supabase.auth.getUser();
-        if (error) {
+        return;
+      } 
+      
+      // Check for errors in search parameters
+      if (search && search.includes('error=')) {
+        const errorParams = new URLSearchParams(search);
+        const errorMessage = errorParams.get('error_description');
+        
+        if (errorMessage) {
+          console.error('Auth error from search:', errorMessage);
           toast({
             title: 'Authentication Error',
-            description: error.message,
+            description: errorMessage.replace(/\+/g, ' '),
             variant: 'destructive',
           });
-        } else if (data?.user) {
-          toast({
-            title: 'Success',
-            description: 'You have been successfully signed in.',
-          });
-          navigate('/');
         }
         
         // Clean up the URL
         window.history.replaceState({}, document.title, window.location.pathname);
+        navigate('/sign-in');
       }
     };
     
@@ -78,11 +84,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     // First set up the auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        console.log("Auth state changed:", _event, session?.user?.id);
-        setSession(session);
-        if (session?.user) {
-          fetchUserProfile(session.user.id);
+      (event, newSession) => {
+        console.log("Auth state changed:", event, newSession?.user?.id);
+        
+        // Update the session state
+        setSession(newSession);
+        
+        // If session exists, fetch the user profile
+        if (newSession?.user) {
+          // Use setTimeout to avoid potential Supabase auth deadlocks
+          setTimeout(() => {
+            fetchUserProfile(newSession.user.id);
+          }, 0);
         } else {
           setUser(null);
           setLoading(false);
@@ -91,17 +104,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 
     // Then check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Initial session check:", session?.user?.id);
-      setSession(session);
-      if (session?.user) {
-        fetchUserProfile(session.user.id);
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      console.log("Initial session check:", currentSession?.user?.id);
+      
+      // Update the session state
+      setSession(currentSession);
+      
+      // If session exists, fetch the user profile
+      if (currentSession?.user) {
+        fetchUserProfile(currentSession.user.id);
       } else {
         setLoading(false);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      // Cleanup subscription on unmount
+      subscription?.unsubscribe();
+    };
   }, [toast, navigate]);
 
   async function fetchUserProfile(userId: string) {
@@ -114,7 +134,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       
       if (data) {
+        console.log("User profile fetched:", data);
         setUser(data as Profile);
+      } else {
+        console.warn("No user profile found for user ID:", userId);
+        // Could handle creating a profile here if needed
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
@@ -130,6 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function signOut() {
     try {
+      setLoading(true);
       await supabase.auth.signOut();
       toast({
         title: 'Signed out',
@@ -143,6 +168,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         description: 'Failed to sign out. Please try again.',
         variant: 'destructive',
       });
+    } finally {
+      setLoading(false);
     }
   }
 
