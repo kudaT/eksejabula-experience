@@ -78,7 +78,7 @@ const Navbar = () => {
               <Link to="/" className="text-gray-700 hover:text-primary">Home</Link>
               <Link to="/shop" className="text-gray-700 hover:text-primary">Shop</Link>
               <Link to="/blog" className="text-gray-700 hover:text-primary">Blog</Link>
-              <Link to="/los-vega" className="text-gray-700 hover:text-primary">About</Link>
+              <Link to="/los-vega" className="text-gray-700 hover:text-primary">Los Vega</Link>
             </div>
           </div>
 
@@ -182,7 +182,7 @@ const Navbar = () => {
                     className="flex items-center gap-2 text-lg font-semibold"
                     onClick={() => setIsOpen(false)}
                   >
-                    About
+                    Los Vega
                   </Link>
                   
                   {user ? (
