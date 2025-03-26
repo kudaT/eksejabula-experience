@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { 
   Card, 
@@ -38,15 +37,21 @@ import { Product, Order, Profile } from '@/lib/supabase-client';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
 
+interface OrderWithProfile extends Order {
+  profiles?: {
+    full_name: string | null;
+    email: string | null;
+  };
+}
+
 const AdminDashboard = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<OrderWithProfile[]>([]);
   const [users, setUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const { toast } = useToast();
 
-  // Form state for new product
   const [newProduct, setNewProduct] = useState<Partial<Product>>({
     name: '',
     description: '',
@@ -60,20 +65,17 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchAdminData = async () => {
       try {
-        // Fetch products
         const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select('*')
           .order('created_at', { ascending: false });
 
-        // Fetch recent orders
         const { data: ordersData, error: ordersError } = await supabase
           .from('orders')
           .select('*, profiles(full_name, email)')
           .order('created_at', { ascending: false })
           .limit(50);
 
-        // Fetch users
         const { data: usersData, error: usersError } = await supabase
           .from('profiles')
           .select('*')
@@ -140,12 +142,10 @@ const AdminDashboard = () => {
         description: 'The product has been added successfully',
       });
 
-      // Update local state
       if (data && data.length > 0) {
         setProducts([data[0], ...products]);
       }
 
-      // Reset form
       setNewProduct({
         name: '',
         description: '',
@@ -176,7 +176,6 @@ const AdminDashboard = () => {
 
       if (error) throw error;
 
-      // Update local state
       setOrders(orders.map(order => 
         order.id === orderId ? { ...order, status } : order
       ));
@@ -225,7 +224,6 @@ const AdminDashboard = () => {
     <div className="container mx-auto p-4 max-w-7xl">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
-      {/* Stats Overview */}
       <div className="grid gap-6 mb-8 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -261,7 +259,6 @@ const AdminDashboard = () => {
         </Card>
       </div>
 
-      {/* Products Section */}
       <Card className="mb-8">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Product Management</CardTitle>
@@ -385,7 +382,6 @@ const AdminDashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Orders Section */}
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>Order Management</CardTitle>
@@ -448,7 +444,6 @@ const AdminDashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Users Section */}
       <Card>
         <CardHeader>
           <CardTitle>User Management</CardTitle>
