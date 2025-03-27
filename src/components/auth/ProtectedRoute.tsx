@@ -14,7 +14,7 @@ const ProtectedRoute = ({
   allowedRoles = [],
   redirectTo = '/auth'
 }: ProtectedRouteProps) => {
-  const { session, user, loading } = useAuth();
+  const { session, user, loading, isAdmin } = useAuth();
   const location = useLocation();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const [checkingAuthorization, setCheckingAuthorization] = useState(true);
@@ -56,12 +56,18 @@ const ProtectedRoute = ({
 
   // Not authenticated
   if (!session || !user) {
+    // Save the current location they were trying to go to
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
   // Not authorized for this route
   if (isAuthorized === false) {
-    return <Navigate to="/unauthorized" replace />;
+    // Handle redirect based on role
+    if (isAdmin) {
+      return <Navigate to="/admin" replace />;
+    } else {
+      return <Navigate to="/dashboard" replace />;
+    }
   }
 
   // User is authenticated and authorized

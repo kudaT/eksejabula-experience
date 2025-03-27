@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/context/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
@@ -61,14 +61,14 @@ const App = () => (
             <Route path="/auth-callback" element={<AuthCallback />} />
             <Route path="/unauthorized" element={<Layout><Unauthorized /></Layout>} />
             
-            {/* User Dashboard - Protected */}
+            {/* User Dashboard - Protected for customers */}
             <Route path="/dashboard" element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['customer']}>
                 <Layout><UserDashboard /></Layout>
               </ProtectedRoute>
             } />
             
-            {/* Admin Routes - Protected */}
+            {/* Admin Routes - Protected for admin role only */}
             <Route path="/admin" element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminLayout />
@@ -81,6 +81,14 @@ const App = () => (
               <Route path="users" element={<AdminUsers />} />
               <Route path="blog" element={<AdminBlog />} />
             </Route>
+
+            {/* Conditional redirects */}
+            <Route path="/account" element={
+              <ProtectedRoute>
+                {/* This will automatically redirect based on user role */}
+                <Navigate to="/dashboard" replace />
+              </ProtectedRoute>
+            } />
             
             <Route path="*" element={<Layout><NotFound /></Layout>} />
           </Routes>
