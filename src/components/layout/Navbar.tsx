@@ -77,8 +77,8 @@ const Navbar = () => {
             <div className="hidden md:flex space-x-6">
               <Link to="/" className="text-gray-700 hover:text-primary">Home</Link>
               <Link to="/shop" className="text-gray-700 hover:text-primary">Shop</Link>
-              <Link to="/blog" className="text-gray-700 hover:text-primary">Blog</Link>
               <Link to="/los-vega" className="text-gray-700 hover:text-primary">Los Vega</Link>
+              <Link to="/blog" className="text-gray-700 hover:text-primary">Blog</Link>
             </div>
           </div>
 
@@ -171,18 +171,18 @@ const Navbar = () => {
                     Shop
                   </Link>
                   <Link 
-                    to="/blog" 
-                    className="flex items-center gap-2 text-lg font-semibold"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Blog
-                  </Link>
-                  <Link 
                     to="/los-vega" 
                     className="flex items-center gap-2 text-lg font-semibold"
                     onClick={() => setIsOpen(false)}
                   >
                     Los Vega
+                  </Link>
+                  <Link 
+                    to="/blog" 
+                    className="flex items-center gap-2 text-lg font-semibold"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Blog
                   </Link>
                   
                   {user ? (

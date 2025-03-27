@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { 
   Package, Users, ShoppingBag, FileText, 
-  ChevronLeft, Menu, Home 
+  ChevronLeft, Menu, Home, Settings 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
@@ -20,6 +20,12 @@ const AdminLayout = () => {
       name: 'Dashboard',
       href: '/admin',
       icon: Home,
+      exact: true,
+    },
+    {
+      name: 'Extended Dashboard',
+      href: '/admin/extended',
+      icon: Settings,
       exact: true,
     },
     {

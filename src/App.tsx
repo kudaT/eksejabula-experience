@@ -19,6 +19,7 @@ import NotFound from "./pages/NotFound";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminExtended from "./pages/admin/AdminExtended";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminUsers from "./pages/admin/AdminUsers";
@@ -48,10 +49,10 @@ const App = () => (
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Layout><Index /></Layout>} />
-            <Route path="/los-vega" element={<Layout><LosVega /></Layout>} />
             <Route path="/shop" element={<Layout><Shop /></Layout>} />
-            <Route path="/product/:id" element={<Layout><ProductDetail /></Layout>} />
+            <Route path="/los-vega" element={<Layout><LosVega /></Layout>} />
             <Route path="/blog" element={<Layout><Blog /></Layout>} />
+            <Route path="/product/:id" element={<Layout><ProductDetail /></Layout>} />
             <Route path="/blog/:id" element={<Layout><BlogPost /></Layout>} />
             <Route path="/checkout/success" element={<CheckoutSuccess />} />
             
@@ -74,6 +75,7 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route index element={<AdminDashboard />} />
+              <Route path="extended" element={<AdminExtended />} />
               <Route path="products" element={<AdminProducts />} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="users" element={<AdminUsers />} />
