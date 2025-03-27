@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { 
   Card, 
@@ -206,7 +207,7 @@ const OrderManagement = () => {
 
       // Also update the order status to shipped if it's not already
       if (selectedOrder.status !== 'shipped') {
-        await handleUpdateOrderStatus(selectedOrder.id, 'shipped' as Order['status']);
+        await handleUpdateOrderStatus(selectedOrder.id, 'shipped');
       }
 
       toast({
@@ -445,7 +446,7 @@ const OrderManagement = () => {
                           <div>
                             <span className="font-medium">Shipment #{index + 1}:</span> {shipment.tracking_number || 'No tracking'}
                           </div>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(shipment.status)}`}>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(shipment.status as Order['status'])}`}>
                             {shipment.status}
                           </span>
                         </div>
