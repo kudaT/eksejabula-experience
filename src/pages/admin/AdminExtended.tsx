@@ -6,6 +6,7 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import OrderManagement from '@/components/admin/OrderManagement';
+import ShippingManagement from '@/components/admin/ShippingManagement';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -160,6 +161,9 @@ const AdminExtended = () => {
       
       {/* Order Management Section */}
       <OrderManagement />
+      
+      {/* Shipping Management Section */}
+      <ShippingManagement />
     </div>
   );
 };

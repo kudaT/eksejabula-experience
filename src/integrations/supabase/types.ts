@@ -325,6 +325,7 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          order_number: string | null
           status: Database["public"]["Enums"]["order_status"] | null
           total_price: number
           user_id: string | null
@@ -332,6 +333,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
+          order_number?: string | null
           status?: Database["public"]["Enums"]["order_status"] | null
           total_price: number
           user_id?: string | null
@@ -339,6 +341,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
+          order_number?: string | null
           status?: Database["public"]["Enums"]["order_status"] | null
           total_price?: number
           user_id?: string | null
@@ -531,6 +534,121 @@ export type Database = {
         }
         Relationships: []
       }
+      returns_exchanges: {
+        Row: {
+          created_at: string | null
+          id: string
+          order_id: string | null
+          reason: string | null
+          refund_amount: number | null
+          return_shipping_label_url: string | null
+          return_type: string | null
+          shipment_id: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          order_id?: string | null
+          reason?: string | null
+          refund_amount?: number | null
+          return_shipping_label_url?: string | null
+          return_type?: string | null
+          shipment_id?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          order_id?: string | null
+          reason?: string | null
+          refund_amount?: number | null
+          return_shipping_label_url?: string | null
+          return_type?: string | null
+          shipment_id?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "returns_exchanges_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "returns_exchanges_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "returns_exchanges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipments: {
+        Row: {
+          carrier_id: string | null
+          created_at: string | null
+          estimated_delivery_date: string | null
+          id: string
+          label_url: string | null
+          order_id: string | null
+          shipping_cost: number | null
+          shipping_method: string | null
+          status: string | null
+          tracking_number: string | null
+        }
+        Insert: {
+          carrier_id?: string | null
+          created_at?: string | null
+          estimated_delivery_date?: string | null
+          id?: string
+          label_url?: string | null
+          order_id?: string | null
+          shipping_cost?: number | null
+          shipping_method?: string | null
+          status?: string | null
+          tracking_number?: string | null
+        }
+        Update: {
+          carrier_id?: string | null
+          created_at?: string | null
+          estimated_delivery_date?: string | null
+          id?: string
+          label_url?: string | null
+          order_id?: string | null
+          shipping_cost?: number | null
+          shipping_method?: string | null
+          status?: string | null
+          tracking_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipments_carrier_id_fkey"
+            columns: ["carrier_id"]
+            isOneToOne: false
+            referencedRelation: "shipping_carriers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shipping_addresses: {
         Row: {
           address_line1: string
@@ -587,6 +705,77 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipping_carriers: {
+        Row: {
+          active: boolean | null
+          api_key: string | null
+          base_url: string | null
+          created_at: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          active?: boolean | null
+          api_key?: string | null
+          base_url?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          active?: boolean | null
+          api_key?: string | null
+          base_url?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      shipping_rates: {
+        Row: {
+          carrier_id: string | null
+          created_at: string | null
+          destination_zip: string
+          id: string
+          origin_zip: string
+          rate: number
+          shipping_method: string
+          weight_max: number | null
+          weight_min: number | null
+        }
+        Insert: {
+          carrier_id?: string | null
+          created_at?: string | null
+          destination_zip: string
+          id?: string
+          origin_zip: string
+          rate: number
+          shipping_method: string
+          weight_max?: number | null
+          weight_min?: number | null
+        }
+        Update: {
+          carrier_id?: string | null
+          created_at?: string | null
+          destination_zip?: string
+          id?: string
+          origin_zip?: string
+          rate?: number
+          shipping_method?: string
+          weight_max?: number | null
+          weight_min?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipping_rates_carrier_id_fkey"
+            columns: ["carrier_id"]
+            isOneToOne: false
+            referencedRelation: "shipping_carriers"
             referencedColumns: ["id"]
           },
         ]

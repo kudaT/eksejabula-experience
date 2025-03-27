@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Card, 
   CardContent, 
@@ -7,11 +7,14 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { 
   Dialog, 
   DialogContent, 
   DialogHeader, 
-  DialogTitle
+  DialogTitle,
+  DialogFooter
 } from '@/components/ui/dialog';
 import { 
   Select, 
@@ -28,7 +31,7 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { FileText, Eye } from 'lucide-react';
+import { FileText, Eye, Truck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -54,16 +57,36 @@ interface Order {
   status: 'pending' | 'paid' | 'shipped' | 'cancelled';
   created_at: string;
   order_items: OrderItem[];
+  order_number: string | null;
   profiles?: {
     full_name: string | null;
     email: string | null;
     phone_number: string | null;
   };
+  shipments?: Array<{
+    id: string;
+    tracking_number: string | null;
+    status: string;
+  }>;
+}
+
+interface ShippingCarrier {
+  id: string;
+  name: string;
 }
 
 const OrderManagement = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isShipmentDialogOpen, setIsShipmentDialogOpen] = useState(false);
+  const [carriers, setCarriers] = useState<ShippingCarrier[]>([]);
+  const [newShipment, setNewShipment] = useState({
+    carrier_id: '',
+    tracking_number: '',
+    shipping_method: 'standard',
+    shipping_cost: 0,
+    estimated_delivery_date: ''
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -79,7 +102,8 @@ const OrderManagement = () => {
           order_items(
             *,
             products:product_id(name, price)
-          )
+          ),
+          shipments(id, tracking_number, status)
         `)
         .order('created_at', { ascending: false });
 
@@ -90,6 +114,25 @@ const OrderManagement = () => {
       return data as Order[];
     }
   });
+
+  // Fetch shipping carriers
+  useEffect(() => {
+    const fetchCarriers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('shipping_carriers')
+          .select('id, name')
+          .eq('active', true);
+        
+        if (error) throw error;
+        setCarriers(data || []);
+      } catch (error) {
+        console.error('Error fetching carriers:', error);
+      }
+    };
+
+    fetchCarriers();
+  }, []);
 
   // Update Order Status
   const handleUpdateOrderStatus = async (orderId: string, newStatus: Order['status']) => {
@@ -130,12 +173,77 @@ const OrderManagement = () => {
     setIsDialogOpen(true);
   };
 
+  // Create Shipment for Order
+  const handleCreateShipment = async () => {
+    if (!selectedOrder) return;
+    if (!newShipment.carrier_id) {
+      toast({
+        variant: 'destructive',
+        title: 'Missing information',
+        description: 'Please select a shipping carrier.'
+      });
+      return;
+    }
+
+    try {
+      // Generate a tracking number if not provided
+      const trackingNumber = newShipment.tracking_number || 
+        `TRK${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+
+      const { data, error } = await supabase
+        .from('shipments')
+        .insert({
+          order_id: selectedOrder.id,
+          carrier_id: newShipment.carrier_id,
+          tracking_number: trackingNumber,
+          shipping_method: newShipment.shipping_method,
+          shipping_cost: newShipment.shipping_cost,
+          status: 'pending',
+          estimated_delivery_date: newShipment.estimated_delivery_date || null
+        })
+        .select();
+
+      if (error) throw error;
+
+      // Also update the order status to shipped if it's not already
+      if (selectedOrder.status !== 'shipped') {
+        await handleUpdateOrderStatus(selectedOrder.id, 'shipped');
+      }
+
+      toast({
+        title: 'Shipment created',
+        description: `Shipment created with tracking number: ${trackingNumber}`
+      });
+
+      setIsShipmentDialogOpen(false);
+      
+      // Reset shipment form
+      setNewShipment({
+        carrier_id: '',
+        tracking_number: '',
+        shipping_method: 'standard',
+        shipping_cost: 0,
+        estimated_delivery_date: ''
+      });
+
+      // Refresh the orders list
+      queryClient.invalidateQueries({ queryKey: ['adminOrders'] });
+    } catch (error) {
+      console.error('Error creating shipment:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error creating shipment',
+        description: 'Could not create the shipment. Please try again.'
+      });
+    }
+  };
+
   // Generate Invoice (placeholder functionality)
   const handleGenerateInvoice = (order: Order) => {
     // This would typically connect to a PDF generation service
     toast({
       title: 'Invoice Generated',
-      description: `Invoice for order ${order.id.substring(0, 8)}... has been generated.`,
+      description: `Invoice for order ${order.order_number || order.id.substring(0, 8)}... has been generated.`,
     });
   };
 
@@ -178,18 +286,21 @@ const OrderManagement = () => {
                 <TableHead>Date</TableHead>
                 <TableHead>Total Amount</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Shipping</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {orders.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center">No orders found</TableCell>
+                  <TableCell colSpan={7} className="text-center">No orders found</TableCell>
                 </TableRow>
               ) : (
                 orders.map((order) => (
                   <TableRow key={order.id}>
-                    <TableCell className="font-medium">{order.id.substring(0, 8)}...</TableCell>
+                    <TableCell className="font-medium">
+                      {order.order_number || order.id.substring(0, 8)}...
+                    </TableCell>
                     <TableCell>
                       {order.profiles?.full_name || 'Unknown'}
                       <div className="text-xs text-muted-foreground">
@@ -202,6 +313,15 @@ const OrderManagement = () => {
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
                         {order.status}
                       </span>
+                    </TableCell>
+                    <TableCell>
+                      {order.shipments && order.shipments.length > 0 ? (
+                        <span className="text-xs">
+                          {order.shipments.length} shipment(s)
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">Not shipped</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
@@ -240,7 +360,9 @@ const OrderManagement = () => {
                   <div className="border rounded p-4">
                     <h3 className="font-medium mb-2">Order Information</h3>
                     <div className="text-sm space-y-1">
-                      <div><span className="text-muted-foreground">ID:</span> {selectedOrder.id}</div>
+                      <div>
+                        <span className="text-muted-foreground">Order #:</span> {selectedOrder.order_number || selectedOrder.id}
+                      </div>
                       <div><span className="text-muted-foreground">Date:</span> {formatDate(selectedOrder.created_at)}</div>
                       <div>
                         <span className="text-muted-foreground">Status:</span> 
@@ -313,6 +435,25 @@ const OrderManagement = () => {
                     </TableBody>
                   </Table>
                 </div>
+
+                {/* Shipment Information (if exists) */}
+                {selectedOrder.shipments && selectedOrder.shipments.length > 0 && (
+                  <div className="border rounded p-4">
+                    <h3 className="font-medium mb-2">Shipment Information</h3>
+                    <div className="text-sm space-y-1">
+                      {selectedOrder.shipments.map((shipment, index) => (
+                        <div key={shipment.id} className="flex justify-between items-center py-1">
+                          <div>
+                            <span className="font-medium">Shipment #{index + 1}:</span> {shipment.tracking_number || 'No tracking'}
+                          </div>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(shipment.status)}`}>
+                            {shipment.status}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 
                 <div className="flex justify-between items-center">
                   <Select
@@ -332,16 +473,116 @@ const OrderManagement = () => {
                     </SelectContent>
                   </Select>
                   
-                  <Button 
-                    variant="outline"
-                    onClick={() => handleGenerateInvoice(selectedOrder)}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Generate Invoice
-                  </Button>
+                  <div className="space-x-2">
+                    <Button 
+                      variant="outline"
+                      onClick={() => handleGenerateInvoice(selectedOrder)}
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Generate Invoice
+                    </Button>
+                    
+                    <Button 
+                      onClick={() => {
+                        setIsShipmentDialogOpen(true);
+                      }}
+                    >
+                      <Truck className="h-4 w-4 mr-2" />
+                      Create Shipment
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Create Shipment Dialog */}
+        <Dialog open={isShipmentDialogOpen} onOpenChange={setIsShipmentDialogOpen}>
+          <DialogContent className="sm:max-w-[550px]">
+            <DialogHeader>
+              <DialogTitle>Create Shipment</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid gap-2">
+                <Label htmlFor="carrier">Shipping Carrier *</Label>
+                <Select
+                  value={newShipment.carrier_id}
+                  onValueChange={(value) => setNewShipment({...newShipment, carrier_id: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select carrier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {carriers.map(carrier => (
+                      <SelectItem key={carrier.id} value={carrier.id}>
+                        {carrier.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="tracking">Tracking Number</Label>
+                <Input
+                  id="tracking"
+                  placeholder="Enter tracking number (optional)"
+                  value={newShipment.tracking_number}
+                  onChange={(e) => setNewShipment({...newShipment, tracking_number: e.target.value})}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Leave blank to generate automatically
+                </p>
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="method">Shipping Method</Label>
+                <Select
+                  value={newShipment.shipping_method}
+                  onValueChange={(value) => setNewShipment({...newShipment, shipping_method: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="standard">Standard</SelectItem>
+                    <SelectItem value="express">Express</SelectItem>
+                    <SelectItem value="overnight">Overnight</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="cost">Shipping Cost</Label>
+                <Input
+                  id="cost"
+                  type="number"
+                  step="0.01"
+                  placeholder="Enter shipping cost"
+                  value={newShipment.shipping_cost.toString()}
+                  onChange={(e) => setNewShipment({...newShipment, shipping_cost: parseFloat(e.target.value)})}
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="delivery-date">Estimated Delivery Date</Label>
+                <Input
+                  id="delivery-date"
+                  type="date"
+                  value={newShipment.estimated_delivery_date}
+                  onChange={(e) => setNewShipment({...newShipment, estimated_delivery_date: e.target.value})}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsShipmentDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleCreateShipment}>
+                Create Shipment
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </CardContent>
