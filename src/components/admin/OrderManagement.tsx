@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { 
   Card, 
@@ -207,7 +206,7 @@ const OrderManagement = () => {
 
       // Also update the order status to shipped if it's not already
       if (selectedOrder.status !== 'shipped') {
-        await handleUpdateOrderStatus(selectedOrder.id, 'shipped');
+        await handleUpdateOrderStatus(selectedOrder.id, 'shipped' as Order['status']);
       }
 
       toast({
