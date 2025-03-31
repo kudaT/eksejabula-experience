@@ -7,7 +7,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { SignInForm } from '@/components/auth/SignInForm';
 import { RegisterForm } from '@/components/auth/RegisterForm';
-import { SocialAuth } from '@/components/auth/SocialAuth';
 
 const SignIn = () => {
   const [searchParams] = useSearchParams();
@@ -53,6 +52,7 @@ const SignIn = () => {
         description: "You have been successfully signed in",
       });
       
+      // Redirect to home page after successful sign in
       navigate('/');
     } catch (error: any) {
       console.error('Error signing in:', error);
@@ -79,7 +79,7 @@ const SignIn = () => {
     setIsLoading(true);
     
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -96,8 +96,25 @@ const SignIn = () => {
         description: "Your account has been created successfully. Please check your email to confirm your account.",
       });
       
-      // Switch to sign in tab
-      setActiveTab('signin');
+      // If signup was successful and email confirmation is not required
+      if (data?.user && !data?.user?.identities?.[0]?.identity_data?.email_verified) {
+        // Login the user automatically
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        
+        if (!signInError) {
+          // Redirect to dashboard
+          navigate('/dashboard');
+        } else {
+          // Switch to sign in tab
+          setActiveTab('signin');
+        }
+      } else {
+        // Switch to sign in tab
+        setActiveTab('signin');
+      }
     } catch (error: any) {
       console.error('Error registering:', error);
       toast({
@@ -106,35 +123,6 @@ const SignIn = () => {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSocialAuth = async (provider: 'google' | 'facebook' | 'apple') => {
-    setIsLoading(true);
-    
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({ 
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        }
-      });
-      
-      if (error) throw error;
-      
-      // The redirect will happen automatically
-      toast({
-        title: "Redirecting",
-        description: `Redirecting to ${provider} for authentication`,
-      });
-    } catch (error: any) {
-      console.error(`Error with ${provider} auth:`, error);
-      toast({
-        title: "Authentication failed",
-        description: error.message || `Failed to authenticate with ${provider}`,
-        variant: "destructive",
-      });
       setIsLoading(false);
     }
   };
@@ -188,13 +176,6 @@ const SignIn = () => {
                 isLoading={isLoading}
                 onSignIn={handleSignIn}
               />
-              
-              <div className="mt-6">
-                <SocialAuth
-                  isLoading={isLoading}
-                  onSocialAuth={handleSocialAuth}
-                />
-              </div>
             </TabsContent>
             
             <TabsContent value="register" className="animate-fade-in">
@@ -202,13 +183,6 @@ const SignIn = () => {
                 isLoading={isLoading}
                 onRegister={handleRegister}
               />
-              
-              <div className="mt-6">
-                <SocialAuth
-                  isLoading={isLoading}
-                  onSocialAuth={handleSocialAuth}
-                />
-              </div>
             </TabsContent>
           </Tabs>
         </div>

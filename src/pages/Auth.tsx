@@ -1,44 +1,18 @@
+
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { SignInForm } from '@/components/auth/SignInForm';
-import { RegisterForm } from '@/components/auth/RegisterForm';
-import { SocialAuth } from '@/components/auth/SocialAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { SignInForm } from '@/components/auth/SignInForm';
+import { RegisterForm } from '@/components/auth/RegisterForm';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-
-  const createTestUsers = async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('create-test-users');
-      
-      if (error) {
-        throw error;
-      }
-      
-      toast({
-        title: 'Test users created',
-        description: 'Admin: admin@eksejabula.co.za / Admin123$\nUser: user@eksejabula.co.za / User123$',
-      });
-    } catch (error) {
-      console.error('Error creating test users:', error);
-      toast({
-        title: 'Error creating test users',
-        description: 'Please try again or check console for details.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col min-h-screen bg-muted/30" style={{backgroundImage: `url('/lovable-uploads/ab316598-d3f2-4574-abf9-ce094d74122e.png')`, backgroundSize: 'cover', backgroundPosition: 'center'}}>
@@ -92,6 +66,14 @@ const Auth = () => {
                       
                       if (error) throw error;
                       
+                      toast({
+                        title: "Sign in successful",
+                        description: "You have been successfully signed in",
+                      });
+                      
+                      // Redirect to home page
+                      navigate('/');
+                      
                     } catch (error) {
                       console.error('Error signing in:', error);
                       toast({
@@ -129,6 +111,20 @@ const Auth = () => {
                         description: 'Your account has been created. Please check your email for confirmation.',
                       });
                       
+                      // If signup was successful and email confirmation is not required
+                      if (data?.user && !data?.user?.identities?.[0]?.identity_data?.email_verified) {
+                        // Login the user automatically
+                        const { error: signInError } = await supabase.auth.signInWithPassword({
+                          email,
+                          password
+                        });
+                        
+                        if (!signInError) {
+                          // Redirect to dashboard
+                          navigate('/dashboard');
+                        }
+                      }
+                      
                     } catch (error) {
                       console.error('Error registering:', error);
                       toast({
@@ -143,85 +139,9 @@ const Auth = () => {
                 />
               </TabsContent>
             </Tabs>
-            
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <Separator />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">
-                    Or continue with
-                  </span>
-                </div>
-              </div>
-              
-              <SocialAuth 
-                isLoading={isLoading}
-                onSocialAuth={async (provider) => {
-                  setIsLoading(true);
-                  try {
-                    let data;
-                    let error;
-                    
-                    if (provider === 'google') {
-                      const result = await supabase.auth.signInWithOAuth({
-                        provider: 'google',
-                        options: {
-                          redirectTo: `${window.location.origin}/auth-callback`,
-                        },
-                      });
-                      data = result.data;
-                      error = result.error;
-                    } else if (provider === 'facebook') {
-                      const result = await supabase.auth.signInWithOAuth({
-                        provider: 'facebook',
-                        options: {
-                          redirectTo: `${window.location.origin}/auth-callback`,
-                        },
-                      });
-                      data = result.data;
-                      error = result.error;
-                    } else if (provider === 'apple') {
-                      const result = await supabase.auth.signInWithOAuth({
-                        provider: 'apple',
-                        options: {
-                          redirectTo: `${window.location.origin}/auth-callback`,
-                        },
-                      });
-                      data = result.data;
-                      error = result.error;
-                    }
-                    
-                    if (error) throw error;
-                    
-                  } catch (error) {
-                    console.error(`Error signing in with ${provider}:`, error);
-                    toast({
-                      title: 'Social sign in failed',
-                      description: error.message || 'Please try again or use another method.',
-                      variant: 'destructive',
-                    });
-                    setIsLoading(false);
-                  }
-                }}
-              />
-            </div>
           </CardContent>
           
           <CardFooter className="flex flex-col">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="mt-2 w-full"
-              onClick={createTestUsers}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
-              ) : null}
-              Create Test Users
-            </Button>
             <p className="text-xs text-muted-foreground text-center mt-4">
               By signing in, you agree to our <Link to="/terms" className="underline">Terms of Service</Link> and <Link to="/privacy" className="underline">Privacy Policy</Link>.
             </p>

@@ -92,18 +92,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // First set up the auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
+        console.log('Auth state changed:', event, newSession?.user?.email);
+        
         // Update the session state
         setSession(newSession);
         
-        // If session exists, fetch the user profile
-        if (newSession?.user) {
-          // Use setTimeout to avoid potential Supabase auth deadlocks
-          setTimeout(() => {
-            fetchUserProfile(newSession.user.id);
-          }, 0);
-        } else {
+        // Handle auth events
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          // Route based on role if we have a user
+          if (newSession?.user) {
+            // Use setTimeout to avoid potential Supabase auth deadlocks
+            setTimeout(() => {
+              fetchUserProfile(newSession.user.id);
+              
+              // Check if we're on the auth page, and redirect if needed
+              if (window.location.pathname === '/auth') {
+                navigate('/');
+              }
+            }, 0);
+          }
+        } else if (event === 'SIGNED_OUT') {
           setUser(null);
           setLoading(false);
+          navigate('/auth');
+        } else {
+          // If the user exists but we're not handling a specific event
+          if (newSession?.user) {
+            // Use setTimeout to avoid potential Supabase auth deadlocks
+            setTimeout(() => {
+              fetchUserProfile(newSession.user.id);
+            }, 0);
+          } else {
+            setUser(null);
+            setLoading(false);
+          }
         }
       }
     );
