@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { SlidersHorizontal, X } from 'lucide-react';
@@ -23,32 +22,32 @@ import {
 import { cn } from '@/lib/utils';
 import ProductCard from '@/components/ui-custom/ProductCard';
 
-// Sample product data for the Shop page
+// Updated product data with new images
 const productData = [
   {
     id: '1',
     name: 'Los Vega Home Jersey',
     price: 599,
-    imageUrl: 'https://images.unsplash.com/photo-1577280927879-b2f0b15c5409',
+    imageUrl: '/lovable-uploads/fb1e25b1-d14f-4fb3-bb21-8a1b63caba9a.png',
     category: 'Jerseys',
     isNew: true,
     isSoldOut: false,
   },
   {
     id: '2',
-    name: 'Los Vega Away Jersey',
+    name: 'Los Vega White & Gold Jersey',
     price: 599,
-    imageUrl: 'https://images.unsplash.com/photo-1580087632545-b497034a0a74',
+    imageUrl: '/lovable-uploads/6bb9dccc-e52b-4b08-a071-cc15b78708b5.png',
     category: 'Jerseys',
     isFeatured: true,
     isSoldOut: false,
   },
   {
     id: '3',
-    name: 'Los Vega Third Kit',
+    name: 'Los Vega Special Edition',
     price: 599,
     discount: 10,
-    imageUrl: 'https://images.unsplash.com/photo-1541051595295-e0e3ad01db18',
+    imageUrl: '/lovable-uploads/693c7831-6859-43e3-8db5-a4c81a400126.png',
     category: 'Jerseys',
     isSoldOut: false,
   },
@@ -106,7 +105,7 @@ const productData = [
     id: '10',
     name: 'Los Vega Limited Edition Jersey',
     price: 799,
-    imageUrl: 'https://images.unsplash.com/photo-1566677914817-56426959ae9c',
+    imageUrl: '/lovable-uploads/b2047f5e-aca1-4dfe-8f68-948c9fed3e09.png',
     category: 'Jerseys',
     isFeatured: true,
     isSoldOut: false,
@@ -149,24 +148,20 @@ const Shop = () => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [selectedFiltersCount, setSelectedFiltersCount] = useState(0);
 
-  // Update category from URL when it changes
   useEffect(() => {
     const category = queryParams.get('category') || 'all';
     setActiveCategory(category);
   }, [location.search]);
 
-  // Apply filters and sorting
   useEffect(() => {
     let result = [...productData];
     
-    // Filter by category
     if (activeCategory !== 'all') {
       result = result.filter(
         product => product.category.toLowerCase() === activeCategory.toLowerCase()
       );
     }
     
-    // Filter by availability
     if (availabilityFilters.inStock) {
       result = result.filter(product => !product.isSoldOut);
     }
@@ -183,12 +178,10 @@ const Shop = () => {
       result = result.filter(product => product.isFeatured);
     }
     
-    // Filter by price range
     result = result.filter(
       product => product.price >= priceRange.min && product.price <= priceRange.max
     );
     
-    // Apply sorting
     switch(sortOption) {
       case 'price-low':
         result.sort((a, b) => {
@@ -205,12 +198,9 @@ const Shop = () => {
         });
         break;
       case 'newest':
-        // For demo, assuming newer items are at the start of the array
-        // In a real app, you would sort by date
         result.sort((a, b) => (a.isNew === b.isNew) ? 0 : a.isNew ? -1 : 1);
         break;
       case 'popular':
-        // For demo, assuming featured items are popular
         result.sort((a, b) => (a.isFeatured === b.isFeatured) ? 0 : a.isFeatured ? -1 : 1);
         break;
       default:
@@ -219,7 +209,6 @@ const Shop = () => {
     
     setFilteredProducts(result);
     
-    // Count total active filters (excluding category selection)
     let count = 0;
     if (availabilityFilters.inStock) count++;
     if (availabilityFilters.newArrivals) count++;
@@ -249,7 +238,6 @@ const Shop = () => {
   return (
     <div className="pt-8 pb-24">
       <div className="container mx-auto px-4">
-        {/* Page Header */}
         <div className="text-center mb-12 animate-slide-up">
           <h1 className="text-4xl md:text-5xl font-display font-medium mb-4">
             Shop Collection
@@ -259,7 +247,6 @@ const Shop = () => {
           </p>
         </div>
 
-        {/* Mobile Category Tabs */}
         <div className="md:hidden mb-6 animate-slide-up">
           <div className="overflow-x-auto pb-2 flex space-x-2">
             <Button
@@ -294,7 +281,6 @@ const Shop = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Desktop Sidebar Filters */}
           <div className="hidden md:block animate-slide-in-right">
             <div className="sticky top-24 space-y-6">
               <div>
@@ -454,9 +440,7 @@ const Shop = () => {
             </div>
           </div>
 
-          {/* Main Content */}
           <div className="md:col-span-3 animate-fade-in">
-            {/* Sorting and Mobile Filter */}
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center">
                 <p className="text-muted-foreground hidden sm:block mr-2">
@@ -672,7 +656,6 @@ const Shop = () => {
               </div>
             </div>
 
-            {/* Active Filters */}
             {selectedFiltersCount > 0 && (
               <div className="flex flex-wrap items-center gap-2 mb-6">
                 {(priceRange.min > 0 || priceRange.max < 1000) && (
@@ -740,7 +723,6 @@ const Shop = () => {
               </div>
             )}
 
-            {/* Product Grid */}
             {filteredProducts.length > 0 ? (
               <div className="product-grid">
                 {filteredProducts.map(product => (

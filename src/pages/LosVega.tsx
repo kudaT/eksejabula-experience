@@ -5,35 +5,13 @@ import { ChevronRight, Palette, Users, Smile } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import HeroSection from '@/components/ui-custom/HeroSection';
-import TestimonialCard from '@/components/ui-custom/TestimonialCard';
 
-// Sample image gallery
+// Updated gallery images with the new uploads
 const galleryImages = [
-  { url: 'https://images.unsplash.com/photo-1577280927879-b2f0b15c5409', alt: 'Los Vega Jersey 1', size: 'large' },
-  { url: 'https://images.unsplash.com/photo-1580087632545-b497034a0a74', alt: 'Los Vega Jersey 2', size: 'small' },
-  { url: 'https://images.unsplash.com/photo-1541051595295-e0e3ad01db18', alt: 'Los Vega Jersey 3', size: 'small' },
-  { url: 'https://images.unsplash.com/photo-1521150932951-303a95503ed3', alt: 'Los Vega Jersey 4', size: 'medium' },
-  { url: 'https://images.unsplash.com/photo-1553859943-a02c5418b798', alt: 'Los Vega Jersey 5', size: 'medium' },
-  { url: 'https://images.unsplash.com/photo-1553859937-1bd92ee053c9', alt: 'Los Vega Jersey 6', size: 'small' },
-];
-
-// Sample testimonials
-const testimonials = [
-  {
-    quote: "Los Vega jerseys have become a staple in my wardrobe. The designs are so unique, I get compliments everywhere I go!",
-    author: "Marcus Chen",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
-  },
-  {
-    quote: "I love how these jerseys blend sport culture with artistic expression. It's like wearing a piece of art.",
-    author: "Jessica Williams",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
-  },
-  {
-    quote: "The quality is amazing and the fit is perfect. I've never had a jersey that feels this comfortable while looking so cool.",
-    author: "David Rodriguez",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
-  },
+  { url: '/lovable-uploads/fb1e25b1-d14f-4fb3-bb21-8a1b63caba9a.png', alt: 'Los Vega White & Gold Jersey - Model 1', size: 'large' },
+  { url: '/lovable-uploads/6bb9dccc-e52b-4b08-a071-cc15b78708b5.png', alt: 'Los Vega White & Gold Jersey - Model 2', size: 'medium' },
+  { url: '/lovable-uploads/693c7831-6859-43e3-8db5-a4c81a400126.png', alt: 'Los Vega White & Gold Jersey - Two Models', size: 'medium' },
+  { url: '/lovable-uploads/b2047f5e-aca1-4dfe-8f68-948c9fed3e09.png', alt: 'Los Vega White & Gold Jersey - Group', size: 'large' },
 ];
 
 const LosVega = () => {
@@ -59,7 +37,7 @@ const LosVega = () => {
         ctaLink="/shop?category=jerseys"
         secondaryCtaText="About The Club"
         secondaryCtaLink="#about"
-        imageUrl="https://images.unsplash.com/photo-1615397349754-cfa2066a298e"
+        imageUrl="/lovable-uploads/b2047f5e-aca1-4dfe-8f68-948c9fed3e09.png"
         alignment="left"
         size="large"
       />
@@ -85,7 +63,7 @@ const LosVega = () => {
           </div>
           <div className="relative h-[500px] rounded-2xl overflow-hidden animate-on-scroll">
             <img 
-              src="https://images.unsplash.com/photo-1526997747035-f4c991fbdb2a" 
+              src="/lovable-uploads/693c7831-6859-43e3-8db5-a4c81a400126.png" 
               alt="Los Vega Team" 
               className="w-full h-full object-cover"
             />
@@ -186,36 +164,15 @@ const LosVega = () => {
             </div>
           ))}
         </div>
-      </section>
 
-      {/* Testimonials */}
-      <section className="py-24 bg-gradient-to-b from-transparent to-secondary/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="section-title">What Los Vega Fans Say</h2>
-            <p className="text-muted-foreground">
-              Hear from the community of Los Vega jersey enthusiasts.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <TestimonialCard 
-                key={index} 
-                {...testimonial} 
-                className="animate-on-scroll" 
-              />
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Button asChild>
-              <Link to="/shop?category=jerseys" className="group">
-                Shop Los Vega Jerseys
-                <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </Button>
-          </div>
+        {/* CTA button moved from the testimonials section to here */}
+        <div className="text-center mt-12">
+          <Button asChild>
+            <Link to="/shop?category=jerseys" className="group">
+              Shop Los Vega Jerseys
+              <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </Button>
         </div>
       </section>
 
