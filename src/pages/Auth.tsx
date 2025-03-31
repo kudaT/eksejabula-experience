@@ -6,9 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import SignInForm from '@/components/auth/SignInForm';
-import RegisterForm from '@/components/auth/RegisterForm';
-import SocialAuth from '@/components/auth/SocialAuth';
+import { SignInForm } from '@/components/auth/SignInForm';
+import { RegisterForm } from '@/components/auth/RegisterForm';
+import { SocialAuth } from '@/components/auth/SocialAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -80,11 +80,68 @@ const Auth = () => {
               </TabsList>
               
               <TabsContent value="signin" className="mt-0">
-                <SignInForm />
+                <SignInForm 
+                  isLoading={isLoading} 
+                  onSignIn={async (email, password, rememberMe) => {
+                    setIsLoading(true);
+                    try {
+                      console.log('Signing in with:', { method: 'email', credential: email, password });
+                      const { data, error } = await supabase.auth.signInWithPassword({
+                        email,
+                        password,
+                      });
+                      
+                      if (error) throw error;
+                      
+                    } catch (error) {
+                      console.error('Error signing in:', error);
+                      toast({
+                        title: 'Sign in failed',
+                        description: error.message || 'Please check your credentials and try again.',
+                        variant: 'destructive',
+                      });
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }} 
+                />
               </TabsContent>
               
               <TabsContent value="register" className="mt-0">
-                <RegisterForm />
+                <RegisterForm 
+                  isLoading={isLoading}
+                  onRegister={async (name, email, password) => {
+                    setIsLoading(true);
+                    try {
+                      const { data, error } = await supabase.auth.signUp({
+                        email,
+                        password,
+                        options: {
+                          data: {
+                            full_name: name,
+                          },
+                        },
+                      });
+                      
+                      if (error) throw error;
+                      
+                      toast({
+                        title: 'Registration successful',
+                        description: 'Your account has been created. Please check your email for confirmation.',
+                      });
+                      
+                    } catch (error) {
+                      console.error('Error registering:', error);
+                      toast({
+                        title: 'Registration failed',
+                        description: error.message || 'Please try again with different credentials.',
+                        variant: 'destructive',
+                      });
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                />
               </TabsContent>
             </Tabs>
             
@@ -100,7 +157,49 @@ const Auth = () => {
                 </div>
               </div>
               
-              <SocialAuth />
+              <SocialAuth 
+                isLoading={isLoading}
+                onSocialAuth={async (provider) => {
+                  setIsLoading(true);
+                  try {
+                    let { data, error };
+                    
+                    if (provider === 'google') {
+                      ({ data, error } = await supabase.auth.signInWithOAuth({
+                        provider: 'google',
+                        options: {
+                          redirectTo: `${window.location.origin}/auth-callback`,
+                        },
+                      }));
+                    } else if (provider === 'facebook') {
+                      ({ data, error } = await supabase.auth.signInWithOAuth({
+                        provider: 'facebook',
+                        options: {
+                          redirectTo: `${window.location.origin}/auth-callback`,
+                        },
+                      }));
+                    } else if (provider === 'apple') {
+                      ({ data, error } = await supabase.auth.signInWithOAuth({
+                        provider: 'apple',
+                        options: {
+                          redirectTo: `${window.location.origin}/auth-callback`,
+                        },
+                      }));
+                    }
+                    
+                    if (error) throw error;
+                    
+                  } catch (error) {
+                    console.error(`Error signing in with ${provider}:`, error);
+                    toast({
+                      title: 'Social sign in failed',
+                      description: error.message || 'Please try again or use another method.',
+                      variant: 'destructive',
+                    });
+                    setIsLoading(false);
+                  }
+                }}
+              />
             </div>
           </CardContent>
           
