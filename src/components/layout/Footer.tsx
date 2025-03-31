@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -115,30 +114,6 @@ const Footer = () => {
                   <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-1-4.8 4-8.9 8-5 1.6-1 3-2.2 4-4z" />
                 </svg>
                 <span className="sr-only">Twitter</span>
-              </a>
-              <a 
-                href="https://www.tiktok.com/@ekse.jabula?_t=ZM-8u6y2cuyzi9&_r=1" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-background/80 hover:text-background transition"
-                aria-label="TikTok"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-5 w-5"
-                >
-                  <path d="M9 12a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />
-                  <path d="M15 8a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
-                  <path d="M15 8v9c0 1.657-1.343 3-3 3" />
-                  <path d="M9 12v-3h7.5" />
-                </svg>
-                <span className="sr-only">TikTok</span>
               </a>
             </div>
           </div>

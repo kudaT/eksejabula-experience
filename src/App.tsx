@@ -28,6 +28,14 @@ import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import Unauthorized from "./pages/Unauthorized";
 import UserDashboard from "./pages/UserDashboard";
+import FAQ from "./pages/FAQ";
+import Shipping from "./pages/Shipping";
+import Returns from "./pages/Returns";
+import SizeGuide from "./pages/SizeGuide";
+import Contact from "./pages/Contact";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Cookies from "./pages/Cookies";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,6 +63,16 @@ const App = () => (
             <Route path="/product/:id" element={<Layout><ProductDetail /></Layout>} />
             <Route path="/blog/:id" element={<Layout><BlogPost /></Layout>} />
             <Route path="/checkout/success" element={<CheckoutSuccess />} />
+            
+            {/* Help & Information Pages */}
+            <Route path="/faq" element={<Layout><FAQ /></Layout>} />
+            <Route path="/shipping" element={<Layout><Shipping /></Layout>} />
+            <Route path="/returns" element={<Layout><Returns /></Layout>} />
+            <Route path="/size-guide" element={<Layout><SizeGuide /></Layout>} />
+            <Route path="/contact" element={<Layout><Contact /></Layout>} />
+            <Route path="/terms" element={<Layout><Terms /></Layout>} />
+            <Route path="/privacy" element={<Layout><Privacy /></Layout>} />
+            <Route path="/cookies" element={<Layout><Cookies /></Layout>} />
             
             {/* Auth Routes */}
             <Route path="/auth" element={<Auth />} />
