@@ -162,29 +162,36 @@ const Auth = () => {
                 onSocialAuth={async (provider) => {
                   setIsLoading(true);
                   try {
-                    let { data, error };
+                    let data;
+                    let error;
                     
                     if (provider === 'google') {
-                      ({ data, error } = await supabase.auth.signInWithOAuth({
+                      const result = await supabase.auth.signInWithOAuth({
                         provider: 'google',
                         options: {
                           redirectTo: `${window.location.origin}/auth-callback`,
                         },
-                      }));
+                      });
+                      data = result.data;
+                      error = result.error;
                     } else if (provider === 'facebook') {
-                      ({ data, error } = await supabase.auth.signInWithOAuth({
+                      const result = await supabase.auth.signInWithOAuth({
                         provider: 'facebook',
                         options: {
                           redirectTo: `${window.location.origin}/auth-callback`,
                         },
-                      }));
+                      });
+                      data = result.data;
+                      error = result.error;
                     } else if (provider === 'apple') {
-                      ({ data, error } = await supabase.auth.signInWithOAuth({
+                      const result = await supabase.auth.signInWithOAuth({
                         provider: 'apple',
                         options: {
                           redirectTo: `${window.location.origin}/auth-callback`,
                         },
-                      }));
+                      });
+                      data = result.data;
+                      error = result.error;
                     }
                     
                     if (error) throw error;
