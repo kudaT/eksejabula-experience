@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, TrendingUp, ShieldCheck, RefreshCw } from 'lucide-react';
+import { ChevronRight, TrendingUp, ShieldCheck, RefreshCw, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn, subscribeToNewsletter } from '@/lib/utils';
 import HeroSection from '@/components/ui-custom/HeroSection';
@@ -13,32 +14,17 @@ const featuredProducts = [
     id: '1',
     name: 'Los Vega Home Jersey',
     price: 599,
-    imageUrl: 'https://images.unsplash.com/photo-1577280927879-b2f0b15c5409',
+    imageUrl: '/lovable-uploads/5543d787-c616-440f-8393-d7b31f0aa342.png',
     category: 'Jerseys',
     isNew: true,
   },
   {
     id: '2',
-    name: 'Los Vega Away Jersey',
-    price: 599,
-    imageUrl: 'https://images.unsplash.com/photo-1580087632545-b497holdings34a0a74',
+    name: 'Tokyo #99 Jersey',
+    price: 649,
+    imageUrl: '/lovable-uploads/cfc48a55-376c-47fc-8dac-9146c37c0f57.png',
     category: 'Jerseys',
     isFeatured: true,
-  },
-  {
-    id: '3',
-    name: 'Premium Beanie - Black',
-    price: 249,
-    imageUrl: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531',
-    category: 'Beanies',
-  },
-  {
-    id: '4',
-    name: 'Street Art Print',
-    price: 349,
-    imageUrl: 'https://images.unsplash.com/photo-1561839561-b13bcfe95249',
-    category: 'Art',
-    discount: 15,
   },
 ];
 
@@ -46,18 +32,20 @@ const featuredProducts = [
 const productCategories = [
   {
     name: 'Jerseys',
-    imageUrl: 'https://images.unsplash.com/photo-1580087632545-b497034a0a74',
+    imageUrl: '/lovable-uploads/5543d787-c616-440f-8393-d7b31f0aa342.png',
     slug: 'jerseys',
   },
   {
     name: 'Beanies',
-    imageUrl: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531',
+    imageUrl: '', // No image for Coming Soon
     slug: 'beanies',
+    comingSoon: true
   },
   {
     name: 'Art & Posters',
-    imageUrl: 'https://images.unsplash.com/photo-1561839561-b13bcfe95249',
+    imageUrl: '', // No image for Coming Soon
     slug: 'art',
+    comingSoon: true
   }
 ];
 
@@ -130,7 +118,7 @@ const Index = () => {
           <div className="group animate-on-scroll relative rounded-xl overflow-hidden aspect-[1/1.2]">
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20 z-10" />
             <img 
-              src="https://images.unsplash.com/photo-1580087632545-b497034a0a74"
+              src="/lovable-uploads/5543d787-c616-440f-8393-d7b31f0aa342.png"
               alt="Jerseys"
               className="object-cover h-full w-full transform group-hover:scale-105 transition-transform duration-500"
             />
@@ -152,55 +140,43 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Beanies Category */}
+          {/* Beanies Category - Coming Soon */}
           <div className="group animate-on-scroll relative rounded-xl overflow-hidden aspect-[1/1.2]">
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20 z-10" />
-            <img 
-              src="https://images.unsplash.com/photo-1576871337622-98d48d1cf531"
-              alt="Beanies"
-              className="object-cover h-full w-full transform group-hover:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute bottom-0 left-0 right-0 p-6 z-20 text-white">
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900"></div>
+            
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 z-20 text-white">
+              <Clock className="w-12 h-12 mb-4 text-white/70" />
               <h3 className="text-2xl font-display font-medium mb-2">Beanies</h3>
-              <p className="text-white/80 mb-4">
+              <div className="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm text-sm font-medium tracking-wider uppercase mb-4">
+                Coming Soon
+              </div>
+              <p className="text-white/80 text-center mb-2 max-w-xs">
                 Stay warm with style. Premium beanies for all seasons.
               </p>
-              <Button 
-                asChild
-                variant="outline"
-                className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20"
-              >
-                <Link to="/shop?category=beanies" className="group/btn">
-                  Explore
-                  <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
-                </Link>
-              </Button>
+              <p className="text-white/70 text-sm text-center">
+                Our collection is in development. Check back soon!
+              </p>
             </div>
           </div>
 
-          {/* Art Category */}
+          {/* Art Category - Coming Soon */}
           <div className="group animate-on-scroll relative rounded-xl overflow-hidden aspect-[1/1.2]">
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20 z-10" />
-            <img 
-              src="https://images.unsplash.com/photo-1561839561-b13bcfe95249"
-              alt="Art"
-              className="object-cover h-full w-full transform group-hover:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute bottom-0 left-0 right-0 p-6 z-20 text-white">
+            <div className="absolute inset-0 bg-gradient-to-bl from-gray-800 to-gray-900"></div>
+            
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 z-20 text-white">
+              <Clock className="w-12 h-12 mb-4 text-white/70" />
               <h3 className="text-2xl font-display font-medium mb-2">Art & Posters</h3>
-              <p className="text-white/80 mb-4">
+              <div className="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm text-sm font-medium tracking-wider uppercase mb-4">
+                Coming Soon
+              </div>
+              <p className="text-white/80 text-center mb-2 max-w-xs">
                 Transform your space with our curated art collection.
               </p>
-              <Button 
-                asChild
-                variant="outline"
-                className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20"
-              >
-                <Link to="/shop?category=art" className="group/btn">
-                  Explore
-                  <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
-                </Link>
-              </Button>
+              <p className="text-white/70 text-sm text-center">
+                Our art collection is in development. Check back soon!
+              </p>
             </div>
           </div>
         </div>
@@ -265,27 +241,29 @@ const Index = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {productCategories
-            .filter(category => activeCategory === 'all' || 
-              category.slug === activeCategory)
-            .map((category, index) => (
-              <Link 
-                to={`/shop?category=${category.slug}`} 
-                key={index}
-                className="group animate-on-scroll rounded-lg overflow-hidden"
-              >
-                <div className="relative aspect-square overflow-hidden">
-                  <img 
-                    src={category.imageUrl} 
-                    alt={category.name} 
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                    <h3 className="text-white font-medium text-lg">{category.name}</h3>
-                  </div>
-                </div>
-              </Link>
-            ))}
+          {activeCategory === 'jerseys' || activeCategory === 'all' ? (
+            featuredProducts.map((product, index) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                imageUrl={product.imageUrl}
+                category={product.category}
+                isNew={product.isNew}
+                isFeatured={product.isFeatured}
+              />
+            ))
+          ) : (
+            <div className="col-span-full flex flex-col items-center justify-center py-12">
+              <Clock className="w-12 h-12 mb-4 text-muted-foreground" />
+              <h3 className="text-xl font-medium mb-2">Coming Soon</h3>
+              <p className="text-muted-foreground text-center max-w-md">
+                We're working hard to bring you amazing {activeCategory === 'beanies' ? 'beanies' : 'art & posters'}.
+                Check back soon!
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="text-center mt-12">

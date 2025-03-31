@@ -15,6 +15,12 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
+import CartDropdown from '../ui-custom/CartDropdown';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -73,22 +79,28 @@ const Navbar = () => {
               Eksejabula
             </Link>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Navigation - Reordered to put shop at the end */}
             <div className="hidden md:flex space-x-6">
               <Link to="/" className="text-gray-700 hover:text-primary">Home</Link>
-              <Link to="/shop" className="text-gray-700 hover:text-primary">Shop</Link>
               <Link to="/los-vega" className="text-gray-700 hover:text-primary">Los Vega</Link>
               <Link to="/blog" className="text-gray-700 hover:text-primary">Blog</Link>
+              <Link to="/shop" className="text-gray-700 hover:text-primary">Shop</Link>
             </div>
           </div>
 
           {/* Desktop Auth and Cart */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link to="/cart">
-              <Button variant="ghost" size="icon">
-                <ShoppingCart className="h-5 w-5" />
-              </Button>
-            </Link>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative">
+                  <ShoppingCart className="h-5 w-5" />
+                  <span className="absolute top-0 right-0 h-4 w-4 text-[10px] font-bold rounded-full bg-primary text-white flex items-center justify-center">2</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-0" align="end">
+                <CartDropdown />
+              </PopoverContent>
+            </Popover>
             
             {user ? (
               <DropdownMenu>
@@ -140,11 +152,17 @@ const Navbar = () => {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
-            <Link to="/cart" className="mr-2">
-              <Button variant="ghost" size="icon">
-                <ShoppingCart className="h-5 w-5" />
-              </Button>
-            </Link>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative mr-2">
+                  <ShoppingCart className="h-5 w-5" />
+                  <span className="absolute top-0 right-0 h-4 w-4 text-[10px] font-bold rounded-full bg-primary text-white flex items-center justify-center">2</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-0" align="end">
+                <CartDropdown />
+              </PopoverContent>
+            </Popover>
             
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
@@ -163,14 +181,6 @@ const Navbar = () => {
                     Home
                   </Link>
                   <Link 
-                    to="/shop" 
-                    className="flex items-center gap-2 text-lg font-semibold"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <ShoppingCart className="h-5 w-5" />
-                    Shop
-                  </Link>
-                  <Link 
                     to="/los-vega" 
                     className="flex items-center gap-2 text-lg font-semibold"
                     onClick={() => setIsOpen(false)}
@@ -183,6 +193,14 @@ const Navbar = () => {
                     onClick={() => setIsOpen(false)}
                   >
                     Blog
+                  </Link>
+                  <Link 
+                    to="/shop" 
+                    className="flex items-center gap-2 text-lg font-semibold"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <ShoppingCart className="h-5 w-5" />
+                    Shop
                   </Link>
                   
                   {user ? (
