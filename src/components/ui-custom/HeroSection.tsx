@@ -42,9 +42,9 @@ const HeroSection = ({
     <section 
       className={cn(
         "relative w-full overflow-hidden",
-        size === 'small' && 'py-12 md:py-16',
-        size === 'medium' && 'py-16 md:py-24',
-        size === 'large' && 'py-20 md:py-32 min-h-[80vh] flex items-center',
+        size === 'small' && 'py-8 md:py-16',
+        size === 'medium' && 'py-12 md:py-24',
+        size === 'large' && 'py-16 md:py-24 lg:py-32 min-h-[60vh] md:min-h-[70vh] lg:min-h-[80vh] flex items-center',
         className
       )}
     >
@@ -63,7 +63,7 @@ const HeroSection = ({
       </div>
 
       {/* Content Container */}
-      <div className="container relative z-20">
+      <div className="container relative z-20 px-4 md:px-6">
         <div 
           className={cn(
             "max-w-3xl text-white transition-all duration-700 delay-300 transform",
@@ -79,27 +79,27 @@ const HeroSection = ({
             </div>
           )}
           <h1 className={cn(
-            "hero-title mb-4",
-            size === 'small' && 'text-3xl md:text-4xl',
-            size === 'medium' && 'text-4xl md:text-5xl',
-            size === 'large' && 'text-5xl md:text-6xl lg:text-7xl'
+            "hero-title mb-4 font-display font-bold",
+            size === 'small' && 'text-2xl sm:text-3xl md:text-4xl',
+            size === 'medium' && 'text-3xl sm:text-4xl md:text-5xl',
+            size === 'large' && 'text-4xl sm:text-5xl md:text-6xl lg:text-7xl'
           )}>
             {title}
           </h1>
           {description && (
-            <p className="text-white/80 text-lg md:text-xl mb-8 max-w-xl mx-auto">
+            <p className="text-white/80 text-base sm:text-lg md:text-xl mb-8 max-w-xl mx-auto">
               {description}
             </p>
           )}
           <div className={cn(
-            "flex gap-4 mt-6",
-            alignment === 'center' && 'justify-center',
+            "flex flex-wrap gap-4 mt-6 justify-center",
+            alignment === 'left' && 'justify-start',
             alignment === 'right' && 'justify-end',
           )}>
             <Button 
               asChild
               size="lg"
-              className="group bg-white text-black hover:bg-white/90 font-medium"
+              className="group bg-white text-black hover:bg-white/90 font-medium w-full sm:w-auto"
             >
               <Link to={ctaLink}>
                 {ctaText}
@@ -111,7 +111,7 @@ const HeroSection = ({
                 asChild
                 size="lg"
                 variant="outline"
-                className="border-white/30 bg-transparent text-white hover:bg-white/10 font-medium"
+                className="border-white/30 bg-transparent text-white hover:bg-white/10 font-medium w-full sm:w-auto"
               >
                 <Link to={secondaryCtaLink}>
                   {secondaryCtaText}

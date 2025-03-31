@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
@@ -42,13 +41,13 @@ const Auth = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-muted/30">
+    <div className="flex flex-col min-h-screen bg-muted/30" style={{backgroundImage: `url('/lovable-uploads/ab316598-d3f2-4574-abf9-ce094d74122e.png')`, backgroundSize: 'cover', backgroundPosition: 'center'}}>
       <Helmet>
         <title>Sign In | Eksejabula</title>
       </Helmet>
       
       <div className="container flex-1 flex items-center justify-center py-8 md:py-12">
-        <Card className="w-full max-w-md shadow-lg">
+        <Card className="w-full max-w-md shadow-lg bg-white/95 backdrop-blur-sm">
           <CardHeader className="text-center">
             <Link to="/" className="inline-block mx-auto mb-4">
               <div className="flex items-center justify-center space-x-2">

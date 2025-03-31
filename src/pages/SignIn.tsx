@@ -151,7 +151,7 @@ const SignIn = () => {
         <div className="lg:w-1/2 lg:pr-8 pb-12 lg:pb-0 animate-fade-in order-2 lg:order-1">
           <div className="rounded-xl overflow-hidden h-64 lg:h-full bg-secondary mb-8 lg:mb-0">
             <img 
-              src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
+              src="/lovable-uploads/ab316598-d3f2-4574-abf9-ce094d74122e.png"
               alt="Eksejabula" 
               className="w-full h-full object-cover"
             />

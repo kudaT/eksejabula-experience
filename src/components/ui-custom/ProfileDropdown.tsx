@@ -32,9 +32,19 @@ const ProfileDropdown = ({
     try {
       if (onSignOut) {
         onSignOut();
-      } else {
-        await signOut();
       }
+      
+      // Always call signOut regardless of whether onSignOut is provided
+      await signOut();
+      
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out"
+      });
+      
+      // Redirect to home page after sign out
+      navigate('/');
+      
     } catch (error) {
       console.error("Error signing out:", error);
       toast({
@@ -71,7 +81,19 @@ const ProfileDropdown = ({
       <DropdownMenuContent align="end" className="w-56">
         {isLoggedIn ? (
           <>
-            <DropdownMenuLabel>{username || 'User'}</DropdownMenuLabel>
+            <DropdownMenuLabel className="flex items-center gap-2">
+              {avatarUrl && (
+                <img 
+                  src={avatarUrl} 
+                  alt={username || "User profile"} 
+                  className="h-8 w-8 rounded-full object-cover"
+                />
+              )}
+              <div>
+                <p className="font-medium">{username || 'User'}</p>
+                {isAdmin && <p className="text-xs text-muted-foreground">Administrator</p>}
+              </div>
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
             
             <DropdownMenuItem asChild>

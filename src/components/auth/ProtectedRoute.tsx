@@ -48,8 +48,11 @@ const ProtectedRoute = ({
   // Show loading while checking authentication and authorization
   if (loading || checkingAuthorization) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
+      <div className="flex items-center justify-center min-h-screen bg-background/50 px-4">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
+          <p className="text-muted-foreground">Verifying access...</p>
+        </div>
       </div>
     );
   }

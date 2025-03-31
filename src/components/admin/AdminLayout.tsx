@@ -3,17 +3,19 @@ import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { 
   Package, Users, ShoppingBag, FileText, 
-  ChevronLeft, Menu, Home, Settings 
+  ChevronLeft, Menu, Home, Settings, LogOut
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useToast } from '@/hooks/use-toast';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const location = useLocation();
+  const { toast } = useToast();
 
   const navItems = [
     {
@@ -60,24 +62,42 @@ const AdminLayout = () => {
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
+  
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out"
+      });
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast({
+        title: "Sign out failed",
+        description: "Please try again",
+        variant: "destructive"
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Mobile Navigation */}
-      <div className="md:hidden fixed top-20 left-4 z-30">
+      <div className="md:hidden fixed top-4 left-4 z-30">
         <Sheet>
           <SheetTrigger asChild>
             <Button size="icon" variant="outline">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-[240px] p-0">
+          <SheetContent side="left" className="w-[280px] p-0">
             <div className="p-6 border-b">
               <h2 className="text-xl font-semibold">Admin Dashboard</h2>
               <p className="text-sm text-muted-foreground">
                 Welcome, {user?.full_name || 'Admin'}
               </p>
             </div>
+            
             <nav className="space-y-1 p-4">
               {navItems.map((item) => (
                 <Link
@@ -94,6 +114,14 @@ const AdminLayout = () => {
                   {item.name}
                 </Link>
               ))}
+              
+              <button
+                onClick={handleSignOut}
+                className="w-full mt-4 flex items-center px-3 py-2 rounded-md text-sm font-medium text-red-500 hover:bg-red-50"
+              >
+                <LogOut className="mr-3 h-5 w-5" />
+                Sign Out
+              </button>
             </nav>
           </SheetContent>
         </Sheet>
@@ -125,6 +153,7 @@ const AdminLayout = () => {
             )} />
           </Button>
         </div>
+        
         <nav className="space-y-1 px-3 py-4">
           {navItems.map((item) => (
             <Link
@@ -142,6 +171,17 @@ const AdminLayout = () => {
               {sidebarOpen && <span>{item.name}</span>}
             </Link>
           ))}
+          
+          <button
+            onClick={handleSignOut}
+            className={cn(
+              "flex items-center px-3 py-2 rounded-md text-sm font-medium text-red-500 hover:bg-red-50 w-full mt-4",
+              !sidebarOpen && "justify-center"
+            )}
+          >
+            <LogOut className={cn("h-5 w-5", sidebarOpen && "mr-3")} />
+            {sidebarOpen && <span>Sign Out</span>}
+          </button>
         </nav>
       </aside>
 

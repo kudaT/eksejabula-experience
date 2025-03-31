@@ -111,7 +111,7 @@ const Index = () => {
         ctaLink="/shop"
         secondaryCtaText="Our Story"
         secondaryCtaLink="/los-vega"
-        imageUrl="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
+        imageUrl="/lovable-uploads/ab316598-d3f2-4574-abf9-ce094d74122e.png"
         alignment="center"
         size="large"
       />
