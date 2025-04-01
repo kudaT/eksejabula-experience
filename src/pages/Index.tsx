@@ -8,13 +8,13 @@ import HeroSection from '@/components/ui-custom/HeroSection';
 import ProductCard from '@/components/ui-custom/ProductCard';
 import InstagramFeed from '@/components/ui-custom/InstagramFeed';
 
-// Sample product data
+// Updated product data with new images
 const featuredProducts = [
   {
     id: '1',
     name: 'Los Vega Home Jersey',
     price: 599,
-    imageUrl: '/lovable-uploads/5543d787-c616-440f-8393-d7b31f0aa342.png',
+    imageUrl: '/lovable-uploads/4926064e-8abf-46e5-9ea6-7e2759668be8.png', // Updated with first uploaded image
     category: 'Jerseys',
     isNew: true,
   },
@@ -22,7 +22,7 @@ const featuredProducts = [
     id: '2',
     name: 'Tokyo #99 Jersey',
     price: 649,
-    imageUrl: '/lovable-uploads/c52e1ed2-b41d-4c7c-a45e-3fc1825f7b52.png',
+    imageUrl: '/lovable-uploads/5a2d0cb4-24d3-460a-a27b-309e3c4f7370.png', // Updated with second uploaded image
     category: 'Jerseys',
     isFeatured: true,
   },
@@ -32,7 +32,7 @@ const featuredProducts = [
 const productCategories = [
   {
     name: 'Jerseys',
-    imageUrl: '/lovable-uploads/5543d787-c616-440f-8393-d7b31f0aa342.png',
+    imageUrl: '/lovable-uploads/4926064e-8abf-46e5-9ea6-7e2759668be8.png', // Updated with first uploaded image
     slug: 'jerseys',
   },
   {
@@ -118,7 +118,7 @@ const Index = () => {
           <div className="group animate-on-scroll relative rounded-xl overflow-hidden aspect-[1/1.2]">
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20 z-10" />
             <img 
-              src="/lovable-uploads/5543d787-c616-440f-8393-d7b31f0aa342.png"
+              src="/lovable-uploads/4926064e-8abf-46e5-9ea6-7e2759668be8.png" // Updated with first uploaded image
               alt="Jerseys"
               className="object-cover h-full w-full transform group-hover:scale-105 transition-transform duration-500"
             />
@@ -247,11 +247,11 @@ const Index = () => {
                 key={product.id}
                 id={product.id}
                 name={product.name}
-                price={product.price}
                 imageUrl={product.imageUrl}
                 category={product.category}
                 isNew={product.isNew}
                 isFeatured={product.isFeatured}
+                showPrice={false} // Hide prices
               />
             ))
           ) : (

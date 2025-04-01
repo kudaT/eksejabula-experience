@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { SlidersHorizontal, X } from 'lucide-react';
@@ -28,7 +29,7 @@ const productData = [
     id: '1',
     name: 'Los Vega Home Jersey',
     price: 599,
-    imageUrl: '/lovable-uploads/fb1e25b1-d14f-4fb3-bb21-8a1b63caba9a.png',
+    imageUrl: '/lovable-uploads/4926064e-8abf-46e5-9ea6-7e2759668be8.png', // Updated with uploaded image
     category: 'Jerseys',
     isNew: true,
     isSoldOut: false,
@@ -37,7 +38,7 @@ const productData = [
     id: '2',
     name: 'Los Vega White & Gold Jersey',
     price: 599,
-    imageUrl: '/lovable-uploads/6bb9dccc-e52b-4b08-a071-cc15b78708b5.png',
+    imageUrl: '/lovable-uploads/5a2d0cb4-24d3-460a-a27b-309e3c4f7370.png', // Updated with uploaded image
     category: 'Jerseys',
     isFeatured: true,
     isSoldOut: false,
@@ -247,6 +248,7 @@ const Shop = () => {
           </p>
         </div>
 
+        {/* Mobile category filters */}
         <div className="md:hidden mb-6 animate-slide-up">
           <div className="overflow-x-auto pb-2 flex space-x-2">
             <Button
@@ -281,6 +283,7 @@ const Shop = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Desktop sidebar filters */}
           <div className="hidden md:block animate-slide-in-right">
             <div className="sticky top-24 space-y-6">
               <div>
@@ -726,7 +729,11 @@ const Shop = () => {
             {filteredProducts.length > 0 ? (
               <div className="product-grid">
                 {filteredProducts.map(product => (
-                  <ProductCard key={product.id} {...product} />
+                  <ProductCard 
+                    key={product.id} 
+                    {...product} 
+                    showPrice={false} // Hide prices
+                  />
                 ))}
               </div>
             ) : (
