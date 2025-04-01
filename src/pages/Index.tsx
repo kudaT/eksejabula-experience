@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, TrendingUp, ShieldCheck, RefreshCw, Clock } from 'lucide-react';
@@ -8,13 +7,12 @@ import HeroSection from '@/components/ui-custom/HeroSection';
 import ProductCard from '@/components/ui-custom/ProductCard';
 import InstagramFeed from '@/components/ui-custom/InstagramFeed';
 
-// Updated product data with new images
 const featuredProducts = [
   {
     id: '1',
     name: 'Los Vega Home Jersey',
     price: 599,
-    imageUrl: '/lovable-uploads/4926064e-8abf-46e5-9ea6-7e2759668be8.png', // Updated with first uploaded image
+    imageUrl: '/lovable-uploads/6a183979-81f4-4dd3-91f3-bba8485f2874.png',
     category: 'Jerseys',
     isNew: true,
   },
@@ -22,28 +20,27 @@ const featuredProducts = [
     id: '2',
     name: 'Tokyo #99 Jersey',
     price: 649,
-    imageUrl: '/lovable-uploads/5a2d0cb4-24d3-460a-a27b-309e3c4f7370.png', // Updated with second uploaded image
+    imageUrl: '/lovable-uploads/ae5b9090-1ad8-4128-a48c-a25b65f35550.png',
     category: 'Jerseys',
     isFeatured: true,
   },
 ];
 
-// Product categories
 const productCategories = [
   {
     name: 'Jerseys',
-    imageUrl: '/lovable-uploads/4926064e-8abf-46e5-9ea6-7e2759668be8.png', // Updated with first uploaded image
+    imageUrl: '/lovable-uploads/4926064e-8abf-46e5-9ea6-7e2759668be8.png',
     slug: 'jerseys',
   },
   {
     name: 'Beanies',
-    imageUrl: '', // No image for Coming Soon
+    imageUrl: '',
     slug: 'beanies',
     comingSoon: true
   },
   {
     name: 'Art & Posters',
-    imageUrl: '', // No image for Coming Soon
+    imageUrl: '',
     slug: 'art',
     comingSoon: true
   }
@@ -90,7 +87,6 @@ const Index = () => {
 
   return (
     <div className="relative">
-      {/* Hero Section */}
       <HeroSection 
         title="Discover Eksejabula"
         subtitle="Premium Lifestyle"
@@ -104,7 +100,6 @@ const Index = () => {
         size="large"
       />
 
-      {/* Featured Categories */}
       <section className="section-container">
         <div className="text-center mb-16">
           <h2 className="section-title">Explore Our Categories</h2>
@@ -114,11 +109,10 @@ const Index = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-8">
-          {/* Jerseys Category */}
           <div className="group animate-on-scroll relative rounded-xl overflow-hidden aspect-[1/1.2]">
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20 z-10" />
             <img 
-              src="/lovable-uploads/4926064e-8abf-46e5-9ea6-7e2759668be8.png" // Updated with first uploaded image
+              src="/lovable-uploads/4926064e-8abf-46e5-9ea6-7e2759668be8.png"
               alt="Jerseys"
               className="object-cover h-full w-full transform group-hover:scale-105 transition-transform duration-500"
             />
@@ -140,7 +134,6 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Beanies Category - Coming Soon */}
           <div className="group animate-on-scroll relative rounded-xl overflow-hidden aspect-[1/1.2]">
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20 z-10" />
             <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900"></div>
@@ -160,7 +153,6 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Art Category - Coming Soon */}
           <div className="group animate-on-scroll relative rounded-xl overflow-hidden aspect-[1/1.2]">
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20 z-10" />
             <div className="absolute inset-0 bg-gradient-to-bl from-gray-800 to-gray-900"></div>
@@ -182,7 +174,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Products */}
       <section className="section-container bg-secondary/50">
         <div className="text-center mb-12">
           <h2 className="section-title">Featured Products</h2>
@@ -251,7 +242,7 @@ const Index = () => {
                 category={product.category}
                 isNew={product.isNew}
                 isFeatured={product.isFeatured}
-                showPrice={false} // Hide prices
+                showPrice={false}
               />
             ))
           ) : (
@@ -276,7 +267,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Why Eksejabula */}
       <section className="section-container">
         <div className="text-center mb-16">
           <h2 className="section-title">Why Eksejabula?</h2>
@@ -318,7 +308,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Instagram Feed */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -351,7 +340,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Newsletter */}
       <section className="bg-foreground text-background py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
