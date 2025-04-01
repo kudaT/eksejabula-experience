@@ -1,17 +1,24 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Palette, Users, Smile } from 'lucide-react';
+import { ChevronRight, Palette, Users, Smile, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import HeroSection from '@/components/ui-custom/HeroSection';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
 
-// Updated gallery images with the new uploads
+// Updated gallery images with only existing valid images
 const galleryImages = [
-  { url: '/lovable-uploads/fb1e25b1-d14f-4fb3-bb21-8a1b63caba9a.png', alt: 'Los Vega White & Gold Jersey - Model 1', size: 'large' },
-  { url: '/lovable-uploads/6bb9dccc-e52b-4b08-a071-cc15b78708b5.png', alt: 'Los Vega White & Gold Jersey - Model 2', size: 'medium' },
-  { url: '/lovable-uploads/693c7831-6859-43e3-8db5-a4c81a400126.png', alt: 'Los Vega White & Gold Jersey - Two Models', size: 'medium' },
   { url: '/lovable-uploads/b2047f5e-aca1-4dfe-8f68-948c9fed3e09.png', alt: 'Los Vega White & Gold Jersey - Group', size: 'large' },
+  { url: '/lovable-uploads/693c7831-6859-43e3-8db5-a4c81a400126.png', alt: 'Los Vega White & Gold Jersey - Two Models', size: 'medium' },
 ];
 
 const LosVega = () => {
@@ -54,12 +61,65 @@ const LosVega = () => {
             <p className="text-lg text-muted-foreground mb-8">
               Today, we're a vibrant community that celebrates the intersection of sport, art, and fashion through uniquely designed jerseys that tell stories and make statements.
             </p>
-            <Button asChild size="lg">
-              <Link to="/blog/los-vega-story" className="group">
-                Read Our Full Story
-                <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button size="lg" variant="default" className="group">
+                  About The Club
+                  <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-4xl">
+                <DialogHeader>
+                  <DialogTitle className="text-3xl font-display">The Los Vega Story</DialogTitle>
+                  <DialogDescription>
+                    Where passion for sport meets artistic expression
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                  <div className="space-y-4">
+                    <p className="text-muted-foreground">
+                      Los Vega was founded in 2019 by a collective of artists, designers, and sports enthusiasts who shared a vision of transforming the conventional sports jersey into a medium for creative expression.
+                    </p>
+                    <p className="text-muted-foreground">
+                      Our name "Los Vega" draws inspiration from both the vibrant cultural heritage of Las Vegas and the creative energy of the Vega star - symbolic of our bright, bold approach to design.
+                    </p>
+                    <p className="text-muted-foreground">
+                      Each Los Vega jersey is more than just sportswear — it's a limited edition art piece, meticulously crafted to tell a unique story through color, pattern, and design elements that challenge traditional sports aesthetics.
+                    </p>
+                    <p className="text-muted-foreground">
+                      Today, we've grown into a global community of creatives and sports lovers who believe in the power of self-expression through what we wear on and off the field.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="rounded-lg overflow-hidden h-64">
+                      <img 
+                        src="/lovable-uploads/693c7831-6859-43e3-8db5-a4c81a400126.png" 
+                        alt="Los Vega Team" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="rounded-lg overflow-hidden h-40">
+                      <img 
+                        src="/lovable-uploads/b2047f5e-aca1-4dfe-8f68-948c9fed3e09.png" 
+                        alt="Los Vega Collection" 
+                        className="w-full h-full object-cover object-top"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center mt-6">
+                  <Button asChild>
+                    <Link to="/shop?category=jerseys">Shop Collection</Link>
+                  </Button>
+                  <DialogClose asChild>
+                    <Button variant="outline" size="icon">
+                      <X className="h-4 w-4" />
+                      <span className="sr-only">Close</span>
+                    </Button>
+                  </DialogClose>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
           <div className="relative h-[500px] rounded-2xl overflow-hidden animate-on-scroll">
             <img 
@@ -131,20 +191,14 @@ const LosVega = () => {
         
         <div 
           className={cn(
-            "grid grid-cols-2 md:grid-cols-3 gap-4 transition-opacity duration-700",
+            "grid grid-cols-1 md:grid-cols-2 gap-6 transition-opacity duration-700",
             isGalleryLoaded ? "opacity-100" : "opacity-0"
           )}
         >
           {galleryImages.map((image, index) => (
             <div 
               key={index} 
-              className={cn(
-                "rounded-xl overflow-hidden bg-secondary",
-                image.size === 'large' && "col-span-2 row-span-2",
-                image.size === 'medium' && "col-span-1 row-span-2",
-                image.size === 'small' && "col-span-1 row-span-1",
-                "animate-on-scroll"
-              )}
+              className="rounded-xl overflow-hidden bg-secondary animate-on-scroll"
             >
               <a 
                 href={`/shop?category=jerseys`}
@@ -153,7 +207,7 @@ const LosVega = () => {
                 <img 
                   src={image.url} 
                   alt={image.alt} 
-                  className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-[400px] object-cover transform group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/30 transition-all duration-300 flex items-center justify-center">
                   <span className="bg-white/90 backdrop-blur-sm text-foreground px-4 py-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-medium">
@@ -165,7 +219,6 @@ const LosVega = () => {
           ))}
         </div>
 
-        {/* CTA button moved from the testimonials section to here */}
         <div className="text-center mt-12">
           <Button asChild>
             <Link to="/shop?category=jerseys" className="group">
