@@ -22,7 +22,7 @@ const featuredProducts = [
     id: '2',
     name: 'Tokyo #99 Jersey',
     price: 649,
-    imageUrl: '/lovable-uploads/c52e1ed2-b41d-4c7c-a45e-3fc1825f7b52.png',
+    imageUrl: '/lovable-uploads/9d55eed4-3404-4d8c-aa3f-9e0c8c8451e5.png',
     category: 'Jerseys',
     isFeatured: true,
   },
@@ -252,6 +252,7 @@ const Index = () => {
                 category={product.category}
                 isNew={product.isNew}
                 isFeatured={product.isFeatured}
+                showPrice={false}
               />
             ))
           ) : (

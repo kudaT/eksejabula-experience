@@ -16,6 +16,7 @@ interface ProductCardProps {
   isSoldOut?: boolean;
   discount?: number;
   className?: string;
+  showPrice?: boolean;
 }
 
 const ProductCard = ({
@@ -29,6 +30,7 @@ const ProductCard = ({
   isSoldOut = false,
   discount = 0,
   className,
+  showPrice = false,
 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
@@ -143,16 +145,18 @@ const ProductCard = ({
             <p className="text-sm text-muted-foreground">{category}</p>
             <h3 className="font-medium text-base mt-1">{name}</h3>
           </div>
-          <div className="text-right">
-            {discountedPrice ? (
-              <>
-                <span className="text-red-500 font-medium">R{discountedPrice.toFixed(2)}</span>
-                <span className="ml-2 text-muted-foreground line-through text-sm">R{price.toFixed(2)}</span>
-              </>
-            ) : (
-              <span className="font-medium">R{price.toFixed(2)}</span>
-            )}
-          </div>
+          {showPrice && (
+            <div className="text-right">
+              {discountedPrice ? (
+                <>
+                  <span className="text-red-500 font-medium">R{discountedPrice.toFixed(2)}</span>
+                  <span className="ml-2 text-muted-foreground line-through text-sm">R{price.toFixed(2)}</span>
+                </>
+              ) : (
+                <span className="font-medium">R{price.toFixed(2)}</span>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </Link>
