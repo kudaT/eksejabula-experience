@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Heart } from 'lucide-react';
+import { ShoppingCart, Heart, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +17,7 @@ interface ProductCardProps {
   discount?: number;
   className?: string;
   showPrice?: boolean;
+  priceToBeUpdated?: boolean;
 }
 
 const ProductCard = ({
@@ -31,6 +32,7 @@ const ProductCard = ({
   discount = 0,
   className,
   showPrice = false,
+  priceToBeUpdated = false,
 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
@@ -147,7 +149,12 @@ const ProductCard = ({
           </div>
           {showPrice && (
             <div className="text-right">
-              {discountedPrice ? (
+              {priceToBeUpdated ? (
+                <div className="flex items-center text-amber-500 text-sm font-medium">
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  Price to be updated
+                </div>
+              ) : discountedPrice ? (
                 <>
                   <span className="text-red-500 font-medium">R{discountedPrice.toFixed(2)}</span>
                   <span className="ml-2 text-muted-foreground line-through text-sm">R{price.toFixed(2)}</span>

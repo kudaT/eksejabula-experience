@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { SlidersHorizontal, X } from 'lucide-react';
+import { SlidersHorizontal, X, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import ProductCard from '@/components/ui-custom/ProductCard';
+import { toast } from 'sonner';
 
 // Updated product data with new images
 const productData = [
@@ -32,6 +34,7 @@ const productData = [
     category: 'Jerseys',
     isNew: true,
     isSoldOut: false,
+    priceToBeUpdated: true,
   },
   {
     id: '2',
@@ -41,6 +44,7 @@ const productData = [
     category: 'Jerseys',
     isFeatured: true,
     isSoldOut: false,
+    priceToBeUpdated: true,
   },
   {
     id: '3',
@@ -50,56 +54,7 @@ const productData = [
     imageUrl: '/lovable-uploads/693c7831-6859-43e3-8db5-a4c81a400126.png',
     category: 'Jerseys',
     isSoldOut: false,
-  },
-  {
-    id: '4',
-    name: 'Premium Beanie - Black',
-    price: 249,
-    imageUrl: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531',
-    category: 'Beanies',
-    isSoldOut: false,
-  },
-  {
-    id: '5',
-    name: 'Premium Beanie - Grey',
-    price: 249,
-    imageUrl: 'https://images.unsplash.com/photo-1578020190125-f4f7c26f4cff',
-    category: 'Beanies',
-    isNew: true,
-    isSoldOut: false,
-  },
-  {
-    id: '6',
-    name: 'Premium Beanie - Red',
-    price: 249,
-    imageUrl: 'https://images.unsplash.com/photo-1611249021021-21220638532a',
-    category: 'Beanies',
-    isSoldOut: false,
-  },
-  {
-    id: '7',
-    name: 'Street Art Print',
-    price: 349,
-    imageUrl: 'https://images.unsplash.com/photo-1561839561-b13bcfe95249',
-    category: 'Art',
-    discount: 15,
-    isSoldOut: false,
-  },
-  {
-    id: '8',
-    name: 'Abstract Gallery Poster',
-    price: 299,
-    imageUrl: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853',
-    category: 'Art',
-    isSoldOut: false,
-  },
-  {
-    id: '9',
-    name: 'Urban Photography Print',
-    price: 379,
-    imageUrl: 'https://images.unsplash.com/photo-1547891654-e66ed7ebb968',
-    category: 'Art',
-    isSoldOut: false,
+    priceToBeUpdated: true,
   },
   {
     id: '10',
@@ -109,24 +64,27 @@ const productData = [
     category: 'Jerseys',
     isFeatured: true,
     isSoldOut: false,
+    priceToBeUpdated: true,
   },
   {
     id: '11',
-    name: 'Eksejabula Signature Beanie',
-    price: 299,
-    imageUrl: 'https://images.unsplash.com/photo-1607611439230-fcbf50e42f54',
-    category: 'Beanies',
-    isFeatured: true,
+    name: 'Los Vega White & Gold Design',
+    price: 599,
+    imageUrl: '/lovable-uploads/a418d18e-fcf2-463b-9676-dac065115595.png',
+    category: 'Jerseys',
+    isNew: true,
     isSoldOut: false,
+    priceToBeUpdated: true,
   },
   {
     id: '12',
-    name: 'Modern Art Collection Print',
-    price: 499,
-    imageUrl: 'https://images.unsplash.com/photo-1536924430914-91f9e2041b83',
-    category: 'Art',
+    name: 'Los Vega Black & Gold Edition',
+    price: 599,
+    imageUrl: '/lovable-uploads/5145cd4a-8f99-49b0-a010-d82ba511d7fa.png',
+    category: 'Jerseys',
     isNew: true,
     isSoldOut: false,
+    priceToBeUpdated: true,
   },
 ];
 
@@ -233,6 +191,16 @@ const Shop = () => {
 
   const handleCategoryChange = (category: string) => {
     setActiveCategory(category);
+    
+    // Show "Coming Soon" toast for non-Jersey categories
+    if (category === 'beanies' || category === 'art') {
+      toast.info(
+        `${category === 'beanies' ? 'Beanies' : 'Art & Posters'} coming soon!`,
+        {
+          description: "We're working on adding these products to our collection."
+        }
+      );
+    }
   };
 
   return (
@@ -723,10 +691,22 @@ const Shop = () => {
               </div>
             )}
 
-            {filteredProducts.length > 0 ? (
-              <div className="product-grid">
+            {(activeCategory === 'beanies' || activeCategory === 'art') ? (
+              <div className="text-center py-16 bg-secondary/50 rounded-xl">
+                <Clock className="w-12 h-12 mb-4 mx-auto text-muted-foreground" />
+                <h3 className="text-xl font-medium mb-2">Coming Soon</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  We're working hard to bring you amazing {activeCategory === 'beanies' ? 'beanies' : 'art & posters'}.
+                  Check back soon!
+                </p>
+                <Button onClick={() => setActiveCategory('jerseys')}>
+                  View Available Jerseys
+                </Button>
+              </div>
+            ) : filteredProducts.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {filteredProducts.map(product => (
-                  <ProductCard key={product.id} {...product} />
+                  <ProductCard key={product.id} {...product} showPrice={true} />
                 ))}
               </div>
             ) : (
@@ -748,3 +728,4 @@ const Shop = () => {
 };
 
 export default Shop;
+

@@ -16,6 +16,7 @@ interface Product {
   isFeatured?: boolean;
   isSoldOut?: boolean;
   discount?: number;
+  priceToBeUpdated?: boolean;
 }
 
 interface FeaturedProductsProps {
@@ -85,19 +86,22 @@ const FeaturedProducts = ({ products }: FeaturedProductsProps) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {activeCategory === 'jerseys' || activeCategory === 'all' ? (
-          products.map((product) => (
-            <ProductCard
-              key={product.id}
-              id={product.id}
-              name={product.name}
-              price={product.price}
-              imageUrl={product.imageUrl}
-              category={product.category}
-              isNew={product.isNew}
-              isFeatured={product.isFeatured}
-              showPrice={false}
-            />
-          ))
+          products
+            .filter(product => activeCategory === 'all' || product.category.toLowerCase() === activeCategory.toLowerCase())
+            .map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                imageUrl={product.imageUrl}
+                category={product.category}
+                isNew={product.isNew}
+                isFeatured={product.isFeatured}
+                showPrice={true}
+                priceToBeUpdated={product.priceToBeUpdated}
+              />
+            ))
         ) : (
           <div className="col-span-full flex flex-col items-center justify-center py-12">
             <Clock className="w-12 h-12 mb-4 text-muted-foreground" />
