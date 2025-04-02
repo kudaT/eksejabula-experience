@@ -36,6 +36,7 @@ const ProductCard = ({
 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const discountedPrice = discount > 0 ? price - (price * (discount / 100)) : null;
 
@@ -50,6 +51,14 @@ const ProductCard = ({
     // Add to wishlist logic will go here
     console.log(`Add to wishlist: ${id}`);
   };
+
+  const handleImageError = () => {
+    setImageError(true);
+    setIsImageLoaded(true); // Still mark as loaded to remove the loading state
+  };
+
+  // Fallback image if the main one fails to load
+  const fallbackImage = "/placeholder.svg";
 
   return (
     <Link 
@@ -70,7 +79,7 @@ const ProductCard = ({
           <div className="absolute inset-0 animate-pulse bg-muted" />
         </div>
         <img
-          src={imageUrl}
+          src={imageError ? fallbackImage : imageUrl}
           alt={name}
           className={cn(
             "h-full w-full object-cover transition-all duration-500",
@@ -78,6 +87,7 @@ const ProductCard = ({
             isImageLoaded ? "opacity-100" : "opacity-0"
           )}
           onLoad={() => setIsImageLoaded(true)}
+          onError={handleImageError}
         />
         
         {/* Product Badges */}
