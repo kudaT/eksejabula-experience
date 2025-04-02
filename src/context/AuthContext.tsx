@@ -34,6 +34,9 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Create local storage key for tracking limited profile toast
+const LIMITED_PROFILE_TOAST_SHOWN = 'limited_profile_toast_shown';
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<Profile | null>(null);
@@ -174,11 +177,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           };
           
           setUser(fallbackProfile);
-          toast({
-            title: 'Limited Profile Access',
-            description: 'Using basic profile information. Some features may be limited.',
-            variant: 'default',
-          });
+          
+          // Check if we've shown the limited profile toast before
+          const toastShown = localStorage.getItem(LIMITED_PROFILE_TOAST_SHOWN);
+          
+          if (!toastShown) {
+            toast({
+              title: 'Limited Profile Access',
+              description: 'Using basic profile information. Some features may be limited.',
+              variant: 'default',
+            });
+            
+            // Mark toast as shown
+            localStorage.setItem(LIMITED_PROFILE_TOAST_SHOWN, 'true');
+          }
         } else {
           toast({
             title: 'Error',
@@ -188,6 +200,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } else if (data) {
         setUser(data as Profile);
+        
+        // Show admin welcome toast if user is an admin
+        if (data.role === 'admin' && (session?.user.app_metadata.provider === 'email' || !session?.user.app_metadata.provider)) {
+          toast({
+            title: 'Admin Access',
+            description: 'Welcome! You have full access to all features and admin capabilities.',
+            variant: 'default',
+          });
+        }
       } else {
         // Could handle creating a profile here if needed
         toast({
