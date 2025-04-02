@@ -19,11 +19,34 @@ interface Product {
   priceToBeUpdated?: boolean;
 }
 
+// Updated product data to match the shop products
+const featuredProducts: Product[] = [
+  {
+    id: '1',
+    name: 'Los Vega Red & Navy Jersey',
+    price: 599,
+    imageUrl: '/lovable-uploads/8ea544dc-5868-4a67-a1c9-6cfbc17fad31.png',
+    category: 'Jerseys',
+    isNew: true,
+    isFeatured: true,
+    priceToBeUpdated: true,
+  },
+  {
+    id: '2',
+    name: 'Los Vega White & Gold Jersey',
+    price: 599,
+    imageUrl: '/lovable-uploads/d086ba96-413b-41a2-adf6-ffa9de4ada7d.png',
+    category: 'Jerseys',
+    isFeatured: true,
+    priceToBeUpdated: true,
+  },
+];
+
 interface FeaturedProductsProps {
-  products: Product[];
+  products?: Product[];
 }
 
-const FeaturedProducts = ({ products }: FeaturedProductsProps) => {
+const FeaturedProducts = ({ products = featuredProducts }: FeaturedProductsProps) => {
   const [activeCategory, setActiveCategory] = useState('all');
 
   return (

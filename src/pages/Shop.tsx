@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { SlidersHorizontal, X, Clock } from 'lucide-react';
@@ -24,15 +23,15 @@ import { cn } from '@/lib/utils';
 import ProductCard from '@/components/ui-custom/ProductCard';
 import { toast } from 'sonner';
 
-// Updated product data with new images
 const productData = [
   {
     id: '1',
-    name: 'Los Vega Home Jersey',
+    name: 'Los Vega Red & Navy Jersey',
     price: 599,
-    imageUrl: '/lovable-uploads/fb1e25b1-d14f-4fb3-bb21-8a1b63caba9a.png',
+    imageUrl: '/lovable-uploads/8ea544dc-5868-4a67-a1c9-6cfbc17fad31.png',
     category: 'Jerseys',
     isNew: true,
+    isFeatured: true,
     isSoldOut: false,
     priceToBeUpdated: true,
   },
@@ -40,49 +39,9 @@ const productData = [
     id: '2',
     name: 'Los Vega White & Gold Jersey',
     price: 599,
-    imageUrl: '/lovable-uploads/6bb9dccc-e52b-4b08-a071-cc15b78708b5.png',
+    imageUrl: '/lovable-uploads/d086ba96-413b-41a2-adf6-ffa9de4ada7d.png',
     category: 'Jerseys',
     isFeatured: true,
-    isSoldOut: false,
-    priceToBeUpdated: true,
-  },
-  {
-    id: '3',
-    name: 'Los Vega Special Edition',
-    price: 599,
-    discount: 10,
-    imageUrl: '/lovable-uploads/693c7831-6859-43e3-8db5-a4c81a400126.png',
-    category: 'Jerseys',
-    isSoldOut: false,
-    priceToBeUpdated: true,
-  },
-  {
-    id: '10',
-    name: 'Los Vega Limited Edition Jersey',
-    price: 799,
-    imageUrl: '/lovable-uploads/b2047f5e-aca1-4dfe-8f68-948c9fed3e09.png',
-    category: 'Jerseys',
-    isFeatured: true,
-    isSoldOut: false,
-    priceToBeUpdated: true,
-  },
-  {
-    id: '11',
-    name: 'Los Vega White & Gold Design',
-    price: 599,
-    imageUrl: '/lovable-uploads/a418d18e-fcf2-463b-9676-dac065115595.png',
-    category: 'Jerseys',
-    isNew: true,
-    isSoldOut: false,
-    priceToBeUpdated: true,
-  },
-  {
-    id: '12',
-    name: 'Los Vega Black & Gold Edition',
-    price: 599,
-    imageUrl: '/lovable-uploads/5145cd4a-8f99-49b0-a010-d82ba511d7fa.png',
-    category: 'Jerseys',
-    isNew: true,
     isSoldOut: false,
     priceToBeUpdated: true,
   },
@@ -192,7 +151,6 @@ const Shop = () => {
   const handleCategoryChange = (category: string) => {
     setActiveCategory(category);
     
-    // Show "Coming Soon" toast for non-Jersey categories
     if (category === 'beanies' || category === 'art') {
       toast.info(
         `${category === 'beanies' ? 'Beanies' : 'Art & Posters'} coming soon!`,
@@ -728,4 +686,3 @@ const Shop = () => {
 };
 
 export default Shop;
-
