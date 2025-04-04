@@ -122,4 +122,5 @@ export function useCart() {
   return context;
 }
 
-export { CartProduct };
+// Export the type using 'export type' to fix the isolatedModules error
+export type { CartProduct };
