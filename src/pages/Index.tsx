@@ -21,7 +21,7 @@ const featuredProducts = [
     id: '2',
     name: 'Los Vega White and Gold',
     price: 649,
-    imageUrl: '/lovable-uploads/9d55eed4-3404-4d8c-aa3f-9e0c8c8451e5.png',
+    imageUrl: '/lovable-uploads/855df925-681a-473e-92f1-8663321ad71e.png',
     category: 'Jerseys',
     isFeatured: true,
   },

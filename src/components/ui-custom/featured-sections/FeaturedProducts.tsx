@@ -35,7 +35,7 @@ const featuredProducts: Product[] = [
     id: '2',
     name: 'Los Vega White and Gold',
     price: 599,
-    imageUrl: '/lovable-uploads/d086ba96-413b-41a2-adf6-ffa9de4ada7d.png',
+    imageUrl: '/lovable-uploads/855df925-681a-473e-92f1-8663321ad71e.png',
     category: 'Jerseys',
     isFeatured: true,
     priceToBeUpdated: true,
