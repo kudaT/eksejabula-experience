@@ -1,12 +1,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Product } from '@/components/shop/types';
+import { Product, CartProduct } from '@/components/shop/types';
 import { toast } from '@/hooks/use-toast';
-
-export interface CartProduct extends Omit<Product, 'category' | 'isNew' | 'isFeatured'> {
-  quantity: number;
-  variant?: string;
-}
 
 interface CartContextType {
   items: CartProduct[];
@@ -126,3 +121,5 @@ export function useCart() {
   }
   return context;
 }
+
+export { CartProduct };

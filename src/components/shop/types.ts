@@ -24,7 +24,8 @@ export interface PriceRange {
   max: number;
 }
 
-export interface CartProduct extends Product {
+// Now matches the definition in CartContext.tsx
+export interface CartProduct extends Omit<Product, 'category' | 'isNew' | 'isFeatured'> {
   quantity: number;
   variant?: string;
 }

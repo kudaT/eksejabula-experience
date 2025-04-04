@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +35,6 @@ const ProductCard = ({
       name,
       price,
       imageUrl,
-      category,
       quantity: 1,
       variant: 'Size: M', // Default variant - in a real app, this would be selected by user
     });
