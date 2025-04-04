@@ -1,23 +1,16 @@
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ShoppingCart, Heart, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ShoppingCart, Heart } from "lucide-react";
+import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { useCart } from "@/context/CartContext";
+import { Product } from "@/components/shop/types";
 
-interface ProductCardProps {
-  id: string;
-  name: string;
-  price: number;
-  imageUrl: string;
-  category: string;
-  isNew?: boolean;
-  isFeatured?: boolean;
-  isSoldOut?: boolean;
-  discount?: number;
-  className?: string;
+interface ProductCardProps extends Product {
   showPrice?: boolean;
-  priceToBeUpdated?: boolean;
+  className?: string;
 }
 
 const ProductCard = ({
@@ -26,157 +19,112 @@ const ProductCard = ({
   price,
   imageUrl,
   category,
-  isNew = false,
-  isFeatured = false,
-  isSoldOut = false,
-  discount = 0,
-  className,
-  showPrice = false,
-  priceToBeUpdated = false,
+  isNew,
+  discount,
+  isSoldOut,
+  showPrice = true,
+  className
 }: ProductCardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
-
-  const discountedPrice = discount > 0 ? price - (price * (discount / 100)) : null;
-
-  const handleQuickAdd = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // Add to cart logic will go here
-    console.log(`Quick add product: ${id}`);
+  const { addToCart } = useCart();
+  
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent card navigation
+    e.stopPropagation();
+    
+    addToCart({
+      id,
+      name,
+      price,
+      imageUrl,
+      category,
+      quantity: 1,
+      variant: 'Size: M', // Default variant - in a real app, this would be selected by user
+    });
   };
-
-  const handleWishlist = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // Add to wishlist logic will go here
-    console.log(`Add to wishlist: ${id}`);
-  };
-
-  const handleImageError = () => {
-    setImageError(true);
-    setIsImageLoaded(true); // Still mark as loaded to remove the loading state
-  };
-
-  // Fallback image if the main one fails to load
-  const fallbackImage = "/placeholder.svg";
+  
+  const discountedPrice = discount ? price - (price * discount / 100) : price;
 
   return (
-    <Link 
-      to={`/product/${id}`}
-      className={cn(
-        "group block relative rounded-xl overflow-hidden transition-all duration-300 animate-scale-in",
-        className
-      )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Product Image */}
-      <div className="aspect-[3/4] relative overflow-hidden bg-secondary">
-        <div className={cn(
-          "absolute inset-0 transition-opacity duration-500",
-          isImageLoaded ? "opacity-0" : "opacity-100"
-        )}>
-          <div className="absolute inset-0 animate-pulse bg-muted" />
-        </div>
-        <img
-          src={imageError ? fallbackImage : imageUrl}
-          alt={name}
-          className={cn(
-            "h-full w-full object-cover transition-all duration-500",
-            isHovered ? "scale-105" : "scale-100",
-            isImageLoaded ? "opacity-100" : "opacity-0"
-          )}
-          onLoad={() => setIsImageLoaded(true)}
-          onError={handleImageError}
-        />
-        
-        {/* Product Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2">
-          {isNew && (
-            <span className="px-2 py-1 bg-accent text-white text-xs font-medium rounded">
-              New
-            </span>
-          )}
-          {isFeatured && (
-            <span className="px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded">
-              Featured
-            </span>
-          )}
-          {discount > 0 && (
-            <span className="px-2 py-1 bg-red-500 text-white text-xs font-medium rounded">
-              {discount}% Off
-            </span>
-          )}
-          {isSoldOut && (
-            <span className="px-2 py-1 bg-gray-800 text-white text-xs font-medium rounded">
-              Sold Out
-            </span>
-          )}
-        </div>
-        
-        {/* Quick Actions */}
-        <div className={cn(
-          "absolute right-3 flex flex-col gap-2 transition-all duration-300",
-          isHovered ? "opacity-100 top-3" : "opacity-0 top-6"
-        )}>
-          <Button
-            variant="outline"
-            size="icon"
-            className="rounded-full h-9 w-9 bg-white hover:bg-white text-foreground shadow-md"
-            onClick={handleWishlist}
-          >
-            <Heart className="h-4 w-4" />
-            <span className="sr-only">Add to wishlist</span>
-          </Button>
-        </div>
-        
-        {/* Quick Add to Cart */}
-        <div className={cn(
-          "absolute bottom-0 left-0 right-0 py-3 px-3 bg-background/90 backdrop-blur-sm transition-all duration-300 flex justify-between items-center",
-          isHovered ? "translate-y-0" : "translate-y-full"
-        )}>
-          <div>
-            <p className="text-sm font-medium">{name}</p>
-            <p className="text-xs text-muted-foreground">{category}</p>
+    <Card className={cn(
+      "group overflow-hidden duration-300 transition bg-white hover:shadow-lg",
+      className
+    )}>
+      <Link to={`/product/${id}`} className="block">
+        <CardHeader className="p-0">
+          <div className="relative aspect-square overflow-hidden">
+            <img 
+              src={imageUrl} 
+              alt={name}
+              className="object-cover w-full h-full group-hover:scale-105 transition duration-500 ease-in-out" 
+            />
+            
+            {/* Product badges */}
+            <div className="absolute top-2 left-2 flex flex-col gap-1">
+              {isNew && (
+                <Badge variant="default" className="bg-blue-500">New</Badge>
+              )}
+              {discount && (
+                <Badge variant="default" className="bg-red-500">{discount}% OFF</Badge>
+              )}
+              {isSoldOut && (
+                <Badge variant="outline" className="bg-gray-100 border-gray-200 text-gray-700">Sold Out</Badge>
+              )}
+            </div>
+
+            {/* Quick actions */}
+            <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Button 
+                size="sm" 
+                variant="secondary" 
+                className="rounded-full h-9 w-9 p-0 mr-1"
+                title="Add to wishlist"
+              >
+                <Heart className="h-4 w-4" />
+              </Button>
+              <Button 
+                size="sm" 
+                variant="secondary" 
+                className="rounded-full h-9 w-9 p-0"
+                title="Add to cart"
+                onClick={handleAddToCart}
+                disabled={isSoldOut}
+              >
+                <ShoppingCart className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <Button
-            size="icon"
-            className="rounded-full h-8 w-8 bg-foreground text-background hover:bg-foreground/90"
-            onClick={handleQuickAdd}
-          >
-            <ShoppingCart className="h-4 w-4" />
-            <span className="sr-only">Quick add</span>
-          </Button>
-        </div>
-      </div>
-      
-      {/* Product Info */}
-      <div className="pt-3 pb-2 flex flex-col">
-        <div className="flex justify-between items-start">
-          <div>
-            <p className="text-sm text-muted-foreground">{category}</p>
-            <h3 className="font-medium text-base mt-1">{name}</h3>
-          </div>
+        </CardHeader>
+        
+        <CardContent className="p-4">
+          <h3 className="font-medium text-sm line-clamp-1">{name}</h3>
+          
           {showPrice && (
-            <div className="text-right">
-              {priceToBeUpdated ? (
-                <div className="flex items-center text-amber-500 text-sm font-medium">
-                  <AlertCircle className="h-3 w-3 mr-1" />
-                  Price to be updated
+            <div className="mt-1">
+              {discount ? (
+                <div className="flex items-center">
+                  <span className="font-bold text-primary">R{discountedPrice.toFixed(2)}</span>
+                  <span className="text-gray-400 text-xs line-through ml-2">R{price.toFixed(2)}</span>
                 </div>
-              ) : discountedPrice ? (
-                <>
-                  <span className="text-red-500 font-medium">R{discountedPrice.toFixed(2)}</span>
-                  <span className="ml-2 text-muted-foreground line-through text-sm">R{price.toFixed(2)}</span>
-                </>
               ) : (
-                <span className="font-medium">R{price.toFixed(2)}</span>
+                <span className="font-bold text-primary">R{price.toFixed(2)}</span>
               )}
             </div>
           )}
-        </div>
-      </div>
-    </Link>
+          
+          <div className="mt-2">
+            <Button 
+              size="sm" 
+              className="w-full"
+              disabled={isSoldOut}
+              variant={isSoldOut ? "outline" : "default"}
+              onClick={isSoldOut ? undefined : handleAddToCart}
+            >
+              {isSoldOut ? "Out of Stock" : "Add to Cart"}
+            </Button>
+          </div>
+        </CardContent>
+      </Link>
+    </Card>
   );
 };
 

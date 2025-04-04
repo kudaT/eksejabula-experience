@@ -1,37 +1,16 @@
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Trash2, Plus, Minus, AlertCircle } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-
-// Demo data for the cart items
-const demoCartItems = [
-  {
-    id: '1',
-    name: 'Los Vega Home Jersey',
-    price: 599,
-    quantity: 1,
-    image: '/lovable-uploads/5543d787-c616-440f-8393-d7b31f0aa342.png',
-    variant: 'Size: M',
-  },
-  {
-    id: '2',
-    name: 'Tokyo #99 Jersey',
-    price: 649,
-    quantity: 1,
-    image: '/lovable-uploads/cfc48a55-376c-47fc-8dac-9146c37c0f57.png',
-    variant: 'Size: L',
-  },
-];
+import { useCart } from '@/context/CartContext';
 
 interface CartItemProps {
   id: string;
   name: string;
   price: number;
   quantity: number;
-  image: string;
+  imageUrl: string; // Changed from image to imageUrl to match Product type
   variant?: string;
   onUpdateQuantity: (id: string, newQuantity: number) => void;
   onRemoveItem: (id: string) => void;
@@ -42,7 +21,7 @@ const CartItem = ({
   name, 
   price, 
   quantity, 
-  image, 
+  imageUrl, // Changed from image to imageUrl
   variant, 
   onUpdateQuantity,
   onRemoveItem
@@ -51,7 +30,7 @@ const CartItem = ({
     <div className="flex py-4 border-b last:border-b-0">
       <div className="h-20 w-20 flex-shrink-0 rounded-md overflow-hidden bg-secondary">
         <img
-          src={image}
+          src={imageUrl} // Changed from image to imageUrl
           alt={name}
           className="h-full w-full object-cover"
         />
@@ -100,37 +79,8 @@ const CartItem = ({
 };
 
 const CartDropdown = ({ className }: { className?: string }) => {
-  const [items, setItems] = useState(demoCartItems);
+  const { items, itemCount, subtotal, updateQuantity, removeFromCart, clearCart } = useCart();
   const isEmpty = items.length === 0;
-  
-  // Calculate totals
-  const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
-  
-  // Handling item quantity updates
-  const handleUpdateQuantity = (id: string, newQuantity: number) => {
-    setItems(prev => prev.map(item => 
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    ));
-  };
-  
-  // Handling item removal
-  const handleRemoveItem = (id: string) => {
-    setItems(prev => prev.filter(item => item.id !== id));
-    toast({
-      title: "Item removed",
-      description: "The item has been removed from your cart.",
-    });
-  };
-  
-  // Clear all items
-  const handleClearCart = () => {
-    setItems([]);
-    toast({
-      title: "Cart cleared",
-      description: "All items have been removed from your cart.",
-    });
-  };
 
   return (
     <div className={cn("px-4 py-3", className)}>
@@ -141,7 +91,7 @@ const CartDropdown = ({ className }: { className?: string }) => {
             variant="ghost" 
             size="sm" 
             className="h-8 px-2 text-muted-foreground hover:text-foreground"
-            onClick={handleClearCart}
+            onClick={clearCart}
           >
             Clear All
           </Button>
@@ -165,9 +115,14 @@ const CartDropdown = ({ className }: { className?: string }) => {
             {items.map(item => (
               <CartItem 
                 key={item.id} 
-                {...item} 
-                onUpdateQuantity={handleUpdateQuantity}
-                onRemoveItem={handleRemoveItem}
+                id={item.id}
+                name={item.name}
+                price={item.price}
+                quantity={item.quantity}
+                imageUrl={item.imageUrl}
+                variant={item.variant}
+                onUpdateQuantity={updateQuantity}
+                onRemoveItem={removeFromCart}
               />
             ))}
             

@@ -23,3 +23,8 @@ export interface PriceRange {
   min: number;
   max: number;
 }
+
+export interface CartProduct extends Product {
+  quantity: number;
+  variant?: string;
+}

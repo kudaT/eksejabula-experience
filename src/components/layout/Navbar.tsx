@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Home, Menu, ShoppingCart, User, LogOut, Lock } from 'lucide-react';
@@ -16,6 +15,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import CartDropdown from '../ui-custom/CartDropdown';
+import { useCart } from '@/context/CartContext';
 import {
   Popover,
   PopoverContent,
@@ -25,6 +25,7 @@ import {
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut, isAdmin } = useAuth();
+  const { itemCount } = useCart();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -79,7 +80,7 @@ const Navbar = () => {
               Eksejabula
             </Link>
 
-            {/* Desktop Navigation - Reordered to put shop at the end */}
+            {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-6">
               <Link to="/" className="text-gray-700 hover:text-primary">Home</Link>
               <Link to="/los-vega" className="text-gray-700 hover:text-primary">Los Vega</Link>
@@ -94,7 +95,11 @@ const Navbar = () => {
               <PopoverTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">
                   <ShoppingCart className="h-5 w-5" />
-                  <span className="absolute top-0 right-0 h-4 w-4 text-[10px] font-bold rounded-full bg-primary text-white flex items-center justify-center">2</span>
+                  {itemCount > 0 && (
+                    <span className="absolute top-0 right-0 h-4 w-4 text-[10px] font-bold rounded-full bg-primary text-white flex items-center justify-center">
+                      {itemCount > 99 ? '99+' : itemCount}
+                    </span>
+                  )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80 p-0" align="end">
@@ -156,7 +161,11 @@ const Navbar = () => {
               <PopoverTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative mr-2">
                   <ShoppingCart className="h-5 w-5" />
-                  <span className="absolute top-0 right-0 h-4 w-4 text-[10px] font-bold rounded-full bg-primary text-white flex items-center justify-center">2</span>
+                  {itemCount > 0 && (
+                    <span className="absolute top-0 right-0 h-4 w-4 text-[10px] font-bold rounded-full bg-primary text-white flex items-center justify-center">
+                      {itemCount > 99 ? '99+' : itemCount}
+                    </span>
+                  )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80 p-0" align="end">
