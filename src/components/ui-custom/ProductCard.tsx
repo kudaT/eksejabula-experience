@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -54,6 +55,10 @@ const ProductCard = ({
               src={imageUrl} 
               alt={name}
               className="object-cover w-full h-full group-hover:scale-105 transition duration-500 ease-in-out" 
+              onError={(e) => {
+                console.error(`Error loading image: ${imageUrl}`);
+                e.currentTarget.src = '/placeholder.svg'; // Fallback to placeholder
+              }}
             />
             
             {/* Product badges */}
