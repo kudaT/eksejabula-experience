@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { SlidersHorizontal, X, Clock } from 'lucide-react';
@@ -23,7 +24,21 @@ import { cn } from '@/lib/utils';
 import ProductCard from '@/components/ui-custom/ProductCard';
 import { toast } from 'sonner';
 
-const productData = [
+// Update the product interface to include the discount property
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  imageUrl: string;
+  category: string;
+  isNew?: boolean;
+  isFeatured?: boolean;
+  isSoldOut?: boolean;
+  discount?: number;
+  priceToBeUpdated?: boolean;
+}
+
+const productData: Product[] = [
   {
     id: '1',
     name: 'Los Vega Red & Navy Jersey',
