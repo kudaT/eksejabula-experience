@@ -11,7 +11,7 @@ import NewsletterSection from '@/components/ui-custom/featured-sections/Newslett
 const featuredProducts = [
   {
     id: '1',
-    name: 'Los Vega Home Jersey',
+    name: 'Los Vega Red and Navy',
     price: 599,
     imageUrl: '/lovable-uploads/5543d787-c616-440f-8393-d7b31f0aa342.png',
     category: 'Jerseys',
@@ -19,7 +19,7 @@ const featuredProducts = [
   },
   {
     id: '2',
-    name: 'Tokyo #99 Jersey',
+    name: 'Los Vega White and Gold',
     price: 649,
     imageUrl: '/lovable-uploads/9d55eed4-3404-4d8c-aa3f-9e0c8c8451e5.png',
     category: 'Jerseys',
@@ -80,7 +80,7 @@ const Index = () => {
       <FeaturedCategories categories={productCategories} />
 
       {/* Featured Products */}
-      <FeaturedProducts products={featuredProducts} />
+      <FeaturedProducts products={featuredProducts} showPrice={false} />
 
       {/* Why Eksejabula */}
       <FeatureHighlights />

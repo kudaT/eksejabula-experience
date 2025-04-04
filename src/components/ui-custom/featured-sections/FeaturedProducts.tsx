@@ -23,7 +23,7 @@ interface Product {
 const featuredProducts: Product[] = [
   {
     id: '1',
-    name: 'Los Vega Red & Navy Jersey',
+    name: 'Los Vega Red and Navy',
     price: 599,
     imageUrl: '/lovable-uploads/8ea544dc-5868-4a67-a1c9-6cfbc17fad31.png',
     category: 'Jerseys',
@@ -33,7 +33,7 @@ const featuredProducts: Product[] = [
   },
   {
     id: '2',
-    name: 'Los Vega White & Gold Jersey',
+    name: 'Los Vega White and Gold',
     price: 599,
     imageUrl: '/lovable-uploads/d086ba96-413b-41a2-adf6-ffa9de4ada7d.png',
     category: 'Jerseys',
@@ -44,9 +44,10 @@ const featuredProducts: Product[] = [
 
 interface FeaturedProductsProps {
   products?: Product[];
+  showPrice?: boolean;
 }
 
-const FeaturedProducts = ({ products = featuredProducts }: FeaturedProductsProps) => {
+const FeaturedProducts = ({ products = featuredProducts, showPrice = true }: FeaturedProductsProps) => {
   const [activeCategory, setActiveCategory] = useState('all');
 
   return (
@@ -121,7 +122,7 @@ const FeaturedProducts = ({ products = featuredProducts }: FeaturedProductsProps
                 category={product.category}
                 isNew={product.isNew}
                 isFeatured={product.isFeatured}
-                showPrice={true}
+                showPrice={showPrice}
                 priceToBeUpdated={product.priceToBeUpdated}
               />
             ))
