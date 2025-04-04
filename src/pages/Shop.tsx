@@ -1,42 +1,15 @@
 
 import { useState, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import { SlidersHorizontal, X, Clock } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useLocation } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Separator } from '@/components/ui/separator';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
-import { cn } from '@/lib/utils';
-import ProductCard from '@/components/ui-custom/ProductCard';
 import { toast } from 'sonner';
-
-// Update the product interface to include the discount property
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  imageUrl: string;
-  category: string;
-  isNew?: boolean;
-  isFeatured?: boolean;
-  isSoldOut?: boolean;
-  discount?: number;
-  priceToBeUpdated?: boolean;
-}
+import { ShopFilters } from '@/components/shop/ShopFilters';
+import { MobileFilters } from '@/components/shop/MobileFilters';
+import { FilterBadges } from '@/components/shop/FilterBadges';
+import { CategoryTabs } from '@/components/shop/CategoryTabs';
+import { SortSelect } from '@/components/shop/SortSelect';
+import { ProductGrid } from '@/components/shop/ProductGrid';
+import { Product, AvailabilityFilters, PriceRange } from '@/components/shop/types';
 
 const productData: Product[] = [
   {
@@ -69,14 +42,14 @@ const Shop = () => {
 
   const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [sortOption, setSortOption] = useState('newest');
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
-  const [availabilityFilters, setAvailabilityFilters] = useState({
+  const [priceRange, setPriceRange] = useState<PriceRange>({ min: 0, max: 1000 });
+  const [availabilityFilters, setAvailabilityFilters] = useState<AvailabilityFilters>({
     inStock: false,
     newArrivals: false,
     onSale: false,
     featured: false,
   });
-  const [filteredProducts, setFilteredProducts] = useState(productData);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(productData);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [selectedFiltersCount, setSelectedFiltersCount] = useState(0);
 
@@ -188,197 +161,22 @@ const Shop = () => {
           </p>
         </div>
 
-        <div className="md:hidden mb-6 animate-slide-up">
-          <div className="overflow-x-auto pb-2 flex space-x-2">
-            <Button
-              variant={activeCategory === 'all' ? 'default' : 'outline'}
-              onClick={() => handleCategoryChange('all')}
-              className="rounded-full flex-shrink-0"
-            >
-              All
-            </Button>
-            <Button
-              variant={activeCategory === 'jerseys' ? 'default' : 'outline'}
-              onClick={() => handleCategoryChange('jerseys')}
-              className="rounded-full flex-shrink-0"
-            >
-              Jerseys
-            </Button>
-            <Button
-              variant={activeCategory === 'beanies' ? 'default' : 'outline'}
-              onClick={() => handleCategoryChange('beanies')}
-              className="rounded-full flex-shrink-0"
-            >
-              Beanies
-            </Button>
-            <Button
-              variant={activeCategory === 'art' ? 'default' : 'outline'}
-              onClick={() => handleCategoryChange('art')}
-              className="rounded-full flex-shrink-0"
-            >
-              Art
-            </Button>
-          </div>
-        </div>
+        <CategoryTabs 
+          activeCategory={activeCategory}
+          onCategoryChange={handleCategoryChange}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="hidden md:block animate-slide-in-right">
-            <div className="sticky top-24 space-y-6">
-              <div>
-                <h3 className="font-medium text-lg mb-3">Categories</h3>
-                <div className="space-y-2">
-                  <Button
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-start px-3",
-                      activeCategory === 'all' && "bg-secondary"
-                    )}
-                    onClick={() => handleCategoryChange('all')}
-                  >
-                    All Products
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-start px-3",
-                      activeCategory === 'jerseys' && "bg-secondary"
-                    )}
-                    onClick={() => handleCategoryChange('jerseys')}
-                  >
-                    Jerseys
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-start px-3",
-                      activeCategory === 'beanies' && "bg-secondary"
-                    )}
-                    onClick={() => handleCategoryChange('beanies')}
-                  >
-                    Beanies
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-start px-3",
-                      activeCategory === 'art' && "bg-secondary"
-                    )}
-                    onClick={() => handleCategoryChange('art')}
-                  >
-                    Art & Posters
-                  </Button>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="font-medium text-lg mb-3">Availability</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center">
-                    <Checkbox
-                      id="in-stock"
-                      checked={availabilityFilters.inStock}
-                      onCheckedChange={(checked) => 
-                        setAvailabilityFilters({
-                          ...availabilityFilters,
-                          inStock: !!checked
-                        })
-                      }
-                    />
-                    <label htmlFor="in-stock" className="ml-2 text-sm font-medium">
-                      In Stock
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <Checkbox
-                      id="new-arrivals"
-                      checked={availabilityFilters.newArrivals}
-                      onCheckedChange={(checked) => 
-                        setAvailabilityFilters({
-                          ...availabilityFilters,
-                          newArrivals: !!checked
-                        })
-                      }
-                    />
-                    <label htmlFor="new-arrivals" className="ml-2 text-sm font-medium">
-                      New Arrivals
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <Checkbox
-                      id="on-sale"
-                      checked={availabilityFilters.onSale}
-                      onCheckedChange={(checked) => 
-                        setAvailabilityFilters({
-                          ...availabilityFilters,
-                          onSale: !!checked
-                        })
-                      }
-                    />
-                    <label htmlFor="on-sale" className="ml-2 text-sm font-medium">
-                      On Sale
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <Checkbox
-                      id="featured"
-                      checked={availabilityFilters.featured}
-                      onCheckedChange={(checked) => 
-                        setAvailabilityFilters({
-                          ...availabilityFilters,
-                          featured: !!checked
-                        })
-                      }
-                    />
-                    <label htmlFor="featured" className="ml-2 text-sm font-medium">
-                      Featured
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="font-medium text-lg mb-4">Price Range</h3>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="w-20">
-                    <input
-                      type="number"
-                      value={priceRange.min}
-                      onChange={(e) => setPriceRange({...priceRange, min: Number(e.target.value)})}
-                      className="w-full px-2 py-1 border rounded text-sm"
-                      min="0"
-                      max={priceRange.max}
-                    />
-                  </div>
-                  <span className="text-muted-foreground">to</span>
-                  <div className="w-20">
-                    <input
-                      type="number"
-                      value={priceRange.max}
-                      onChange={(e) => setPriceRange({...priceRange, max: Number(e.target.value)})}
-                      className="w-full px-2 py-1 border rounded text-sm"
-                      min={priceRange.min}
-                      max="1000"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={clearAllFilters}
-                >
-                  Clear All Filters
-                </Button>
-              </div>
-            </div>
+            <ShopFilters 
+              activeCategory={activeCategory}
+              availabilityFilters={availabilityFilters}
+              priceRange={priceRange}
+              onCategoryChange={handleCategoryChange}
+              onAvailabilityChange={setAvailabilityFilters}
+              onPriceRangeChange={setPriceRange}
+              onClearFilters={clearAllFilters}
+            />
           </div>
 
           <div className="md:col-span-3 animate-fade-in">
@@ -394,305 +192,42 @@ const Shop = () => {
                 )}
               </div>
               <div className="flex items-center space-x-2">
-                <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
-                  <SheetTrigger asChild>
-                    <Button variant="outline" className="md:hidden flex items-center">
-                      <SlidersHorizontal className="h-4 w-4 mr-2" />
-                      Filters
-                      {selectedFiltersCount > 0 && (
-                        <Badge className="ml-2 h-5 w-5 p-0 flex items-center justify-center rounded-full">
-                          {selectedFiltersCount}
-                        </Badge>
-                      )}
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="left">
-                    <SheetHeader>
-                      <SheetTitle>Filters</SheetTitle>
-                    </SheetHeader>
-                    <div className="py-4 space-y-6">
-                      <div>
-                        <h3 className="font-medium text-lg mb-3">Categories</h3>
-                        <div className="space-y-2">
-                          <Button
-                            variant="ghost"
-                            className={cn(
-                              "w-full justify-start px-3",
-                              activeCategory === 'all' && "bg-secondary"
-                            )}
-                            onClick={() => {
-                              handleCategoryChange('all');
-                              setMobileFiltersOpen(false);
-                            }}
-                          >
-                            All Products
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            className={cn(
-                              "w-full justify-start px-3",
-                              activeCategory === 'jerseys' && "bg-secondary"
-                            )}
-                            onClick={() => {
-                              handleCategoryChange('jerseys');
-                              setMobileFiltersOpen(false);
-                            }}
-                          >
-                            Jerseys
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            className={cn(
-                              "w-full justify-start px-3",
-                              activeCategory === 'beanies' && "bg-secondary"
-                            )}
-                            onClick={() => {
-                              handleCategoryChange('beanies');
-                              setMobileFiltersOpen(false);
-                            }}
-                          >
-                            Beanies
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            className={cn(
-                              "w-full justify-start px-3",
-                              activeCategory === 'art' && "bg-secondary"
-                            )}
-                            onClick={() => {
-                              handleCategoryChange('art');
-                              setMobileFiltersOpen(false);
-                            }}
-                          >
-                            Art & Posters
-                          </Button>
-                        </div>
-                      </div>
+                <MobileFilters 
+                  activeCategory={activeCategory}
+                  availabilityFilters={availabilityFilters}
+                  priceRange={priceRange}
+                  selectedFiltersCount={selectedFiltersCount}
+                  mobileFiltersOpen={mobileFiltersOpen}
+                  setMobileFiltersOpen={setMobileFiltersOpen}
+                  onCategoryChange={handleCategoryChange}
+                  onAvailabilityChange={setAvailabilityFilters}
+                  onPriceRangeChange={setPriceRange}
+                  onClearFilters={clearAllFilters}
+                />
 
-                      <Separator />
-
-                      <div>
-                        <h3 className="font-medium text-lg mb-3">Availability</h3>
-                        <div className="space-y-2">
-                          <div className="flex items-center">
-                            <Checkbox
-                              id="mobile-in-stock"
-                              checked={availabilityFilters.inStock}
-                              onCheckedChange={(checked) => 
-                                setAvailabilityFilters({
-                                  ...availabilityFilters,
-                                  inStock: !!checked
-                                })
-                              }
-                            />
-                            <label htmlFor="mobile-in-stock" className="ml-2 text-sm font-medium">
-                              In Stock
-                            </label>
-                          </div>
-                          <div className="flex items-center">
-                            <Checkbox
-                              id="mobile-new-arrivals"
-                              checked={availabilityFilters.newArrivals}
-                              onCheckedChange={(checked) => 
-                                setAvailabilityFilters({
-                                  ...availabilityFilters,
-                                  newArrivals: !!checked
-                                })
-                              }
-                            />
-                            <label htmlFor="mobile-new-arrivals" className="ml-2 text-sm font-medium">
-                              New Arrivals
-                            </label>
-                          </div>
-                          <div className="flex items-center">
-                            <Checkbox
-                              id="mobile-on-sale"
-                              checked={availabilityFilters.onSale}
-                              onCheckedChange={(checked) => 
-                                setAvailabilityFilters({
-                                  ...availabilityFilters,
-                                  onSale: !!checked
-                                })
-                              }
-                            />
-                            <label htmlFor="mobile-on-sale" className="ml-2 text-sm font-medium">
-                              On Sale
-                            </label>
-                          </div>
-                          <div className="flex items-center">
-                            <Checkbox
-                              id="mobile-featured"
-                              checked={availabilityFilters.featured}
-                              onCheckedChange={(checked) => 
-                                setAvailabilityFilters({
-                                  ...availabilityFilters,
-                                  featured: !!checked
-                                })
-                              }
-                            />
-                            <label htmlFor="mobile-featured" className="ml-2 text-sm font-medium">
-                              Featured
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-
-                      <Separator />
-
-                      <div>
-                        <h3 className="font-medium text-lg mb-4">Price Range</h3>
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="w-20">
-                            <input
-                              type="number"
-                              value={priceRange.min}
-                              onChange={(e) => setPriceRange({...priceRange, min: Number(e.target.value)})}
-                              className="w-full px-2 py-1 border rounded text-sm"
-                              min="0"
-                              max={priceRange.max}
-                            />
-                          </div>
-                          <span className="text-muted-foreground">to</span>
-                          <div className="w-20">
-                            <input
-                              type="number"
-                              value={priceRange.max}
-                              onChange={(e) => setPriceRange({...priceRange, max: Number(e.target.value)})}
-                              className="w-full px-2 py-1 border rounded text-sm"
-                              min={priceRange.min}
-                              max="1000"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <Button 
-                        variant="outline" 
-                        className="w-full"
-                        onClick={() => {
-                          clearAllFilters();
-                          setMobileFiltersOpen(false);
-                        }}
-                      >
-                        Clear All Filters
-                      </Button>
-                    </div>
-                  </SheetContent>
-                </Sheet>
-
-                <Select 
-                  value={sortOption} 
-                  onValueChange={setSortOption}
-                >
-                  <SelectTrigger className="w-[160px]">
-                    <SelectValue placeholder="Sort By" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="newest">Newest</SelectItem>
-                    <SelectItem value="popular">Popular</SelectItem>
-                    <SelectItem value="price-low">Price: Low to High</SelectItem>
-                    <SelectItem value="price-high">Price: High to Low</SelectItem>
-                  </SelectContent>
-                </Select>
+                <SortSelect 
+                  sortOption={sortOption}
+                  onSortChange={setSortOption}
+                />
               </div>
             </div>
 
             {selectedFiltersCount > 0 && (
-              <div className="flex flex-wrap items-center gap-2 mb-6">
-                {(priceRange.min > 0 || priceRange.max < 1000) && (
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    Price: R{priceRange.min} - R{priceRange.max}
-                    <button 
-                      onClick={() => setPriceRange({ min: 0, max: 1000 })}
-                      className="ml-1 hover:text-destructive"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
-                {availabilityFilters.inStock && (
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    In Stock
-                    <button 
-                      onClick={() => setAvailabilityFilters({...availabilityFilters, inStock: false})}
-                      className="ml-1 hover:text-destructive"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
-                {availabilityFilters.newArrivals && (
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    New Arrivals
-                    <button 
-                      onClick={() => setAvailabilityFilters({...availabilityFilters, newArrivals: false})}
-                      className="ml-1 hover:text-destructive"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
-                {availabilityFilters.onSale && (
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    On Sale
-                    <button 
-                      onClick={() => setAvailabilityFilters({...availabilityFilters, onSale: false})}
-                      className="ml-1 hover:text-destructive"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
-                {availabilityFilters.featured && (
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    Featured
-                    <button 
-                      onClick={() => setAvailabilityFilters({...availabilityFilters, featured: false})}
-                      className="ml-1 hover:text-destructive"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
-                <Button 
-                  variant="ghost" 
-                  className="text-sm h-7 px-2"
-                  onClick={clearAllFilters}
-                >
-                  Clear All
-                </Button>
-              </div>
+              <FilterBadges 
+                priceRange={priceRange}
+                availabilityFilters={availabilityFilters}
+                onPriceRangeChange={setPriceRange}
+                onAvailabilityChange={setAvailabilityFilters}
+                onClearFilters={clearAllFilters}
+              />
             )}
 
-            {(activeCategory === 'beanies' || activeCategory === 'art') ? (
-              <div className="text-center py-16 bg-secondary/50 rounded-xl">
-                <Clock className="w-12 h-12 mb-4 mx-auto text-muted-foreground" />
-                <h3 className="text-xl font-medium mb-2">Coming Soon</h3>
-                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                  We're working hard to bring you amazing {activeCategory === 'beanies' ? 'beanies' : 'art & posters'}.
-                  Check back soon!
-                </p>
-                <Button onClick={() => setActiveCategory('jerseys')}>
-                  View Available Jerseys
-                </Button>
-              </div>
-            ) : filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {filteredProducts.map(product => (
-                  <ProductCard key={product.id} {...product} showPrice={true} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16 bg-secondary/50 rounded-xl">
-                <h3 className="text-xl font-medium mb-2">No products found</h3>
-                <p className="text-muted-foreground mb-6">
-                  Try adjusting your filters to find what you're looking for.
-                </p>
-                <Button onClick={clearAllFilters}>
-                  Clear All Filters
-                </Button>
-              </div>
-            )}
+            <ProductGrid 
+              products={filteredProducts}
+              activeCategory={activeCategory}
+              onCategoryChange={handleCategoryChange}
+              onClearFilters={clearAllFilters}
+            />
           </div>
         </div>
       </div>
