@@ -2,6 +2,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { toast } from '@/hooks/use-toast';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -19,6 +20,18 @@ const ProtectedRoute = ({
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const [checkingAuthorization, setCheckingAuthorization] = useState(true);
 
+  // Debug information
+  useEffect(() => {
+    console.log('ProtectedRoute - Auth State:', { 
+      session: !!session, 
+      user, 
+      loading, 
+      isAdmin, 
+      allowedRoles,
+      path: location.pathname
+    });
+  }, [session, user, loading, isAdmin, allowedRoles, location.pathname]);
+
   useEffect(() => {
     // Only check authorization if we have a session and user
     if (!loading && session && user) {
@@ -30,6 +43,14 @@ const ProtectedRoute = ({
       
       // If no roles are required, the user is authorized
       if (allowedRoles.length === 0) {
+        setIsAuthorized(true);
+        setCheckingAuthorization(false);
+        return;
+      }
+
+      // Force update for admin routes if the user is an admin
+      if (location.pathname.startsWith('/admin') && isAdmin) {
+        console.log('Admin accessing admin route - automatically authorizing');
         setIsAuthorized(true);
         setCheckingAuthorization(false);
         return;
@@ -51,7 +72,7 @@ const ProtectedRoute = ({
       setIsAuthorized(false);
       setCheckingAuthorization(false);
     }
-  }, [loading, session, user, allowedRoles, isAdmin]);
+  }, [loading, session, user, allowedRoles, isAdmin, location.pathname]);
 
   // Show loading while checking authentication and authorization
   if (loading || checkingAuthorization) {
@@ -68,12 +89,22 @@ const ProtectedRoute = ({
   // Not authenticated
   if (!session || !user) {
     // Save the current location they were trying to go to
+    toast({
+      title: "Authentication required",
+      description: "Please sign in to continue",
+    });
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
   // Not authorized for this route
   if (isAuthorized === false) {
     console.log('User not authorized, redirecting to appropriate page');
+    toast({
+      title: "Access denied",
+      description: "You don't have permission to access this page",
+      variant: "destructive",
+    });
+    
     // Handle redirect based on role
     if (isAdmin) {
       return <Navigate to="/admin" replace />;

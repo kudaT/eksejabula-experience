@@ -1,5 +1,5 @@
 
-import { User, Settings, Package, Heart, LogOut } from 'lucide-react';
+import { User, Settings, Package, Heart, LogOut, RefreshCw } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,7 +20,7 @@ interface ProfileDropdownProps {
 const ProfileDropdown = ({
   onSignOut,
 }: ProfileDropdownProps) => {
-  const { user, session, isAdmin, signOut } = useAuth();
+  const { user, session, isAdmin, signOut, refreshUserProfile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -57,6 +57,23 @@ const ProfileDropdown = ({
     }
   };
   
+  const handleRefreshProfile = async () => {
+    try {
+      await refreshUserProfile();
+      toast({
+        title: "Profile refreshed",
+        description: "Your profile has been updated"
+      });
+    } catch (error) {
+      console.error("Error refreshing profile:", error);
+      toast({
+        title: "Profile refresh failed",
+        description: "Please try again",
+        variant: "destructive"
+      });
+    }
+  };
+  
   const handleSignIn = () => {
     navigate('/auth');
   };
@@ -78,6 +95,11 @@ const ProfileDropdown = ({
           ) : (
             <User className="h-5 w-5" />
           )}
+          {isAdmin && (
+            <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-4 w-4 flex items-center justify-center">
+              A
+            </span>
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
@@ -94,7 +116,7 @@ const ProfileDropdown = ({
               <div>
                 <p className="font-medium">{username || 'User'}</p>
                 <p className="text-xs text-muted-foreground">Role: {user?.role || 'customer'}</p>
-                {isAdmin && <p className="text-xs text-muted-foreground">Administrator</p>}
+                {isAdmin && <p className="text-xs text-muted-foreground font-semibold text-primary">Administrator</p>}
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
@@ -104,6 +126,11 @@ const ProfileDropdown = ({
                 <User className="mr-2 h-4 w-4" />
                 <span>My Account</span>
               </Link>
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem onClick={handleRefreshProfile} className="cursor-pointer flex items-center">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              <span>Refresh Profile</span>
             </DropdownMenuItem>
             
             {isAdmin && (

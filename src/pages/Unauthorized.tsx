@@ -3,16 +3,16 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle, ArrowLeft, ShieldAlert, UserRound } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { signOut } from "@/lib/supabase-client";
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from "@/hooks/use-toast";
 
 const Unauthorized = () => {
-  const { user } = useAuth();
+  const { user, isAdmin, refreshUserProfile } = useAuth();
   const navigate = useNavigate();
   
   const handleSignOut = async () => {
     try {
-      await signOut();
+      await supabase.auth.signOut();
       toast({
         title: "Signed out successfully",
         description: "You have been signed out"
@@ -23,6 +23,28 @@ const Unauthorized = () => {
       toast({
         title: "Error signing out",
         description: "Please try again",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  const handleRefreshProfile = async () => {
+    try {
+      await refreshUserProfile();
+      toast({
+        title: "Profile refreshed",
+        description: "Your profile data has been updated"
+      });
+      
+      // If user is admin after refresh, redirect to admin
+      if (isAdmin) {
+        navigate('/admin');
+      }
+    } catch (error) {
+      console.error('Error refreshing profile:', error);
+      toast({
+        title: "Error",
+        description: "Could not refresh profile data",
         variant: "destructive"
       });
     }
@@ -45,6 +67,7 @@ const Unauthorized = () => {
             <div className="text-left">
               <p className="font-medium">{user.full_name || 'User'}</p>
               <p className="text-sm text-muted-foreground">Role: {user.role || 'Unknown'}</p>
+              <p className="text-sm text-muted-foreground">Admin status: {isAdmin ? 'Yes' : 'No'}</p>
             </div>
           </div>
         ) : null}
@@ -57,9 +80,14 @@ const Unauthorized = () => {
           </Button>
           
           {user ? (
-            <Button variant="default" onClick={handleSignOut}>
-              Sign Out
-            </Button>
+            <>
+              <Button variant="default" onClick={handleRefreshProfile}>
+                Refresh Profile
+              </Button>
+              <Button variant="secondary" onClick={handleSignOut}>
+                Sign Out
+              </Button>
+            </>
           ) : (
             <Button asChild variant="default">
               <Link to="/auth">Sign In</Link>
@@ -68,11 +96,16 @@ const Unauthorized = () => {
         </div>
       </div>
       
-      {user && user.role === 'customer' && (
-        <div className="mt-8 max-w-md text-center text-sm text-muted-foreground">
-          <p>If you believe you should have access to this page, please contact the site administrator.</p>
-        </div>
-      )}
+      <div className="mt-8 max-w-md text-center text-sm text-muted-foreground">
+        <p className="mb-4">
+          <strong>Troubleshooting:</strong> If you should have admin access but don't, try refreshing your profile or signing out and back in.
+        </p>
+        {isAdmin && (
+          <Button asChild variant="link" className="text-primary">
+            <Link to="/admin">Go to Admin Dashboard</Link>
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

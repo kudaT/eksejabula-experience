@@ -9,12 +9,16 @@ import { useNavigate } from 'react-router-dom';
 // Helper function to get user profile with correct types
 async function getUserProfile(userId: string) {
   try {
+    console.log('Getting user profile for:', userId);
+    
     // Use direct query to avoid RLS recursion
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
+      
+    console.log('Profile query result:', { data, error });
       
     if (error) throw error;
     return { data, error: null };
@@ -24,12 +28,27 @@ async function getUserProfile(userId: string) {
   }
 }
 
+// Helper function to check if user is admin directly using the is_admin() function
+async function checkIsAdmin() {
+  try {
+    const { data, error } = await supabase.rpc('is_admin');
+    console.log('is_admin RPC result:', { data, error });
+    
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error checking admin status:', error);
+    return false;
+  }
+}
+
 type AuthContextType = {
   session: Session | null;
   user: Profile | null;
   loading: boolean;
   isAdmin: boolean;
   signOut: () => Promise<void>;
+  refreshUserProfile: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,8 +60,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Function to refresh user profile data
+  const refreshUserProfile = async () => {
+    if (session?.user) {
+      await fetchUserProfile(session.user.id);
+    }
+  };
 
   useEffect(() => {
     // Set loading true at the start of the auth check
@@ -116,6 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
+          setIsAdmin(false);
           setLoading(false);
           navigate('/auth');
         } else {
@@ -127,6 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }, 0);
           } else {
             setUser(null);
+            setIsAdmin(false);
             setLoading(false);
           }
         }
@@ -154,7 +183,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function fetchUserProfile(userId: string) {
     try {
+      console.log('Fetching user profile for:', userId);
       setLoading(true);
+      
+      // Check admin status directly using the server-side function
+      const adminStatus = await checkIsAdmin();
+      console.log('Admin status from RPC:', adminStatus);
+      setIsAdmin(adminStatus);
       
       // Try to get the user's metadata from auth first (as a fallback)
       const { data: authData } = await supabase.auth.getUser();
@@ -172,7 +207,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             full_name: userMeta.full_name as string || null,
             email: authData?.user?.email || null,
             phone_number: authData?.user?.phone || null,
-            role: (userMeta.role as 'customer' | 'admin') || 'customer',
+            role: adminStatus ? 'admin' : 'customer',
             avatar_url: userMeta.avatar_url as string || null,
             created_at: new Date().toISOString(),
           };
@@ -201,11 +236,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } else if (data) {
         console.log('Profile data loaded:', data);
-        setUser(data as Profile);
+        // Override role if admin status is true from the RPC check
+        const updatedProfile = {
+          ...data,
+          role: adminStatus ? 'admin' : data.role
+        } as Profile;
+        
+        setUser(updatedProfile);
         
         // Show admin welcome toast if user is an admin
-        if (data.role === 'admin') {
-          console.log('Admin user detected:', data);
+        if (adminStatus) {
+          console.log('Admin user detected:', updatedProfile);
           toast({
             title: 'Admin Access',
             description: 'Welcome! You have full access to all features and admin capabilities.',
@@ -236,6 +277,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       await supabase.auth.signOut();
+      setIsAdmin(false);
       toast({
         title: 'Signed out',
         description: 'You have been successfully signed out.',
@@ -252,7 +294,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const isAdmin = user?.role === 'admin';
   console.log('Current user role status:', { isAdmin, role: user?.role });
 
   const value = {
@@ -261,6 +302,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading,
     isAdmin,
     signOut,
+    refreshUserProfile,
   };
 
   return (
