@@ -28,6 +28,8 @@ const ProfileDropdown = ({
   const username = user?.full_name;
   const avatarUrl = user?.avatar_url;
   
+  console.log('ProfileDropdown - Auth status:', { isAdmin, userRole: user?.role, isLoggedIn });
+  
   const handleSignOut = async () => {
     try {
       if (onSignOut) {
@@ -91,6 +93,7 @@ const ProfileDropdown = ({
               )}
               <div>
                 <p className="font-medium">{username || 'User'}</p>
+                <p className="text-xs text-muted-foreground">Role: {user?.role || 'customer'}</p>
                 {isAdmin && <p className="text-xs text-muted-foreground">Administrator</p>}
               </div>
             </DropdownMenuLabel>

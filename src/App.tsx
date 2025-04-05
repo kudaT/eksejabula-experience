@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -89,7 +90,7 @@ const App = () => (
               
               {/* Admin Routes - Protected for admin role only */}
               <Route path="/admin" element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute allowedRoles={['admin']} redirectTo="/unauthorized">
                   <AdminLayout />
                 </ProtectedRoute>
               }>

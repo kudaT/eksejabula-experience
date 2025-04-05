@@ -22,6 +22,12 @@ const ProtectedRoute = ({
   useEffect(() => {
     // Only check authorization if we have a session and user
     if (!loading && session && user) {
+      console.log('ProtectedRoute - Checking authorization:', { 
+        allowedRoles, 
+        userRole: user.role,
+        isAdmin
+      });
+      
       // If no roles are required, the user is authorized
       if (allowedRoles.length === 0) {
         setIsAuthorized(true);
@@ -32,6 +38,7 @@ const ProtectedRoute = ({
       // Simple role check based on user.role
       if (user.role) {
         const hasRequiredRole = allowedRoles.includes(user.role as 'admin' | 'customer');
+        console.log('Has required role?', hasRequiredRole);
         setIsAuthorized(hasRequiredRole);
       } else {
         setIsAuthorized(false);
@@ -40,10 +47,11 @@ const ProtectedRoute = ({
       setCheckingAuthorization(false);
     } else if (!loading && (!session || !user)) {
       // User is not authenticated
+      console.log('ProtectedRoute - User not authenticated');
       setIsAuthorized(false);
       setCheckingAuthorization(false);
     }
-  }, [loading, session, user, allowedRoles]);
+  }, [loading, session, user, allowedRoles, isAdmin]);
 
   // Show loading while checking authentication and authorization
   if (loading || checkingAuthorization) {
@@ -65,6 +73,7 @@ const ProtectedRoute = ({
 
   // Not authorized for this route
   if (isAuthorized === false) {
+    console.log('User not authorized, redirecting to appropriate page');
     // Handle redirect based on role
     if (isAdmin) {
       return <Navigate to="/admin" replace />;

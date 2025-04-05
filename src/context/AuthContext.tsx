@@ -164,6 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await getUserProfile(userId);
       
       if (error) {
+        console.error('Error fetching profile:', error);
         // Create a fallback profile from auth metadata if profile fetch fails
         if (userMeta) {
           const fallbackProfile: Profile = {
@@ -199,10 +200,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
         }
       } else if (data) {
+        console.log('Profile data loaded:', data);
         setUser(data as Profile);
         
         // Show admin welcome toast if user is an admin
-        if (data.role === 'admin' && (session?.user.app_metadata.provider === 'email' || !session?.user.app_metadata.provider)) {
+        if (data.role === 'admin') {
+          console.log('Admin user detected:', data);
           toast({
             title: 'Admin Access',
             description: 'Welcome! You have full access to all features and admin capabilities.',
@@ -218,6 +221,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
       }
     } catch (error) {
+      console.error('Error in fetchUserProfile:', error);
       toast({
         title: 'Error',
         description: 'Failed to fetch user profile. Please refresh the page.',
@@ -249,6 +253,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const isAdmin = user?.role === 'admin';
+  console.log('Current user role status:', { isAdmin, role: user?.role });
 
   const value = {
     session,
