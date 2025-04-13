@@ -3,8 +3,12 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://iqwbqadqqkdndxdlbwrr.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlxd2JxYWRxcWtkbmR4ZGxid3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MzM5NTAsImV4cCI6MjA1ODQwOTk1MH0.LgyhHWzSbSK-QnRLkjrL5zRSjeF_182x9JBQnUkPScc";
+//const SUPABASE_URL = "https://iqwbqadqqkdndxdlbwrr.supabase.co";
+//const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlxd2JxYWRxcWtkbmR4ZGxid3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MzM5NTAsImV4cCI6MjA1ODQwOTk1MH0.LgyhHWzSbSK-QnRLkjrL5zRSjeF_182x9JBQnUkPScc";
+
+const SUPABASE_URL = "https://xsmfnexoslybenzlqain.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzbWZuZXhvc2x5YmVuemxxYWluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NDE4ODcsImV4cCI6MjA1OTQxNzg4N30.OksHOpb2bZR_UvWQqVIk_uW35MNAnDSu9uufyGQ3srA";
+
 
 // Create a single instance of the Supabase client to prevent "Multiple GoTrueClient instances" warnings
 // Use a unique storage key to avoid conflicts with other applications
